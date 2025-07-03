@@ -29,7 +29,6 @@ const Spinner = () => (
     </svg>
 );
   
-
 export default function OnboardingSurvey({ user, onComplete }) {
     const [formData, setFormData] = useState({
         primary_goal: '',
@@ -67,7 +66,12 @@ export default function OnboardingSurvey({ user, onComplete }) {
         if (updateError) {
             setError(`حدث خطأ: ${updateError.message}`);
         } else {
-            onComplete();
+             const { data: updatedProfile } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+            onComplete(updatedProfile);
         }
     };
 
@@ -77,17 +81,19 @@ export default function OnboardingSurvey({ user, onComplete }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                className="fixed inset-0 bg-black/70 backdrop-blur-sm flex mx-auto items-start sm:items-center justify-center z-50 p-4 overflow-y-auto"
             >
                 <motion.div
                     initial={{ scale: 0.9, opacity: 0, y: 50 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.9, opacity: 0, y: 50 }}
                     transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                    className="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl p-8 text-white text-right"
+                    className="bg-gray-800 rounded-2xl shadow-2xl mx-auto p-8 text-white my-8"
                 >
-                    <h2 className="text-3xl font-bold text-blue-400 mb-2">مرحباً بك في جلينت، {user.user_metadata.first_name || 'يا صديقنا'}!</h2>
-                    <p className="text-gray-300 mb-8">لنخصص خريطة طريقك المهنية. إجاباتك ستساعدنا في إرشادك بشكل أفضل.</p>
+                    <div className="text-right">
+                        <h2 className="text-3xl font-bold text-blue-400 mb-2">مرحباً بك في جلينت، {user.user_metadata.first_name || 'يا صديقنا'}!</h2>
+                        <p className="text-gray-300 mb-8">لنخصص خريطة طريقك المهنية. إجاباتك ستساعدنا في إرشادك بشكل أفضل.</p>
+                    </div>
                     
                     <form onSubmit={handleSubmit} className="space-y-8">
                         <QuestionBlock icon={<FaBullseye />} title="ما هو هدفك الأساسي من استخدام جلينت؟">
@@ -152,4 +158,4 @@ const RadioCard = ({ name, value, label, checked, onChange }) => (
         />
         <span className="text-base">{label}</span>
     </label>
-); 
+);
