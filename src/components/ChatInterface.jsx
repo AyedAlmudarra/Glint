@@ -92,7 +92,7 @@ export default function ChatInterface() {
                 .order('created_at', { ascending: true });
 
             if (error) {
-                console.error('Error fetching messages:', error);
+                // console.error('Error fetching messages:', error);
             } else {
                 setMessages(data);
             }
@@ -129,7 +129,9 @@ export default function ChatInterface() {
 
         // Save user message to DB
         const { error: userError } = await supabase.from('chat_messages').insert(userMessage);
-        if (userError) console.error("Error saving user message:", userError);
+        if (userError) {
+            // console.error("Error saving user message:", userError)
+        };
 
 
         try {
@@ -173,7 +175,7 @@ export default function ChatInterface() {
                 for (const line of lines) {
                     if (line.startsWith('data:')) {
                         const data = line.substring(5).trim();
-                        console.log('Stream data received:', data); // Log the raw data from the stream
+                        // console.log('Stream data received:', data); // Log the raw data from the stream
 
                         if (data === '[DONE]') {
                             break;
@@ -190,8 +192,8 @@ export default function ChatInterface() {
                                         : msg
                                 ));
                             }
-                        } catch (e) {
-                            console.warn("Failed to parse a chunk of the stream:", data, e);
+                        } catch {
+                            // console.warn("Failed to parse a chunk of the stream:", data, e);
                         }
                     }
                 }
@@ -214,13 +216,13 @@ export default function ChatInterface() {
                 .single();
 
             if (aiError) {
-                console.error("Error saving AI message:", aiError);
+                // console.error("Error saving AI message:", aiError);
             } else {
                  setMessages(prev => prev.map(msg => msg.id === tempAiMessageId ? savedAiMessage : msg));
             }
 
 
-        } catch (error) {
+        } catch {
              const errorMessage = { 
                  id: tempAiMessageId,
                  content: 'عذرًا، حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة مرة أخرى.', 
@@ -228,7 +230,7 @@ export default function ChatInterface() {
                  user_id: user.id 
             };
              setMessages(prev => prev.map(msg => msg.id === tempAiMessageId ? errorMessage : msg));
-            console.error('Error invoking Supabase function:', error);
+            // console.error('Error invoking Supabase function:', error);
         } finally {
             setIsLoading(false);
         }
@@ -244,7 +246,7 @@ export default function ChatInterface() {
             .eq('user_id', user.id);
 
         if (error) {
-            console.error('Error clearing chat:', error);
+            // console.error('Error clearing chat:', error);
         } else {
             setMessages([]);
         }
@@ -267,7 +269,7 @@ export default function ChatInterface() {
             .insert({ message_id: messageId, user_id: user.id, rating });
         
         if (error) {
-            console.error('Error submitting feedback:', error);
+            // console.error('Error submitting feedback:', error);
             // Optional: Revert feedback state on error
             setFeedbackSent(prev => {
                 const newState = {...prev};
