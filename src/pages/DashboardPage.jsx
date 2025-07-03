@@ -125,16 +125,28 @@ export default function DashboardPage() {
       }
       setUser(session.user);
 
-      const { data: userProfile, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
+      // Retry logic for fetching the user profile
+      let userProfile = null;
+      let profileError = null;
+      for (let i = 0; i < 5; i++) {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (data) {
+          userProfile = data;
+          profileError = null;
+          break;
+        }
+        
+        profileError = error;
+        await new Promise(res => setTimeout(res, 1000)); // Wait 1 second before retrying
+      }
 
       if (profileError) {
-        console.error("Error fetching profile:", profileError);
-        // It's possible the profile doesn't exist yet if the trigger is slow.
-        // We'll set the profile to a special state to show a message.
+        console.error("Error fetching profile after retries:", profileError);
         setProfile('not_found');
         setLoading(false);
         return;
