@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaGraduationCap, FaArrowRight, FaArrowLeft, FaEye, FaEyeSlash, FaUserPlus } from 'react-icons/fa';
 import { supabase } from '../supabaseClient';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import Spinner from '../components/Spinner';
 import InputField from '../components/forms/InputField';
 
@@ -168,6 +168,7 @@ export default function SignupPage() {
         data: {
           first_name: formData.firstName,
           last_name: formData.lastName,
+          full_name: `${formData.firstName} ${formData.lastName}`.trim(),
           date_of_birth: formData.dateOfBirth,
           education_level: formData.educationLevel,
           fields_of_interest: formData.interests
@@ -189,24 +190,6 @@ export default function SignupPage() {
     }
   };
 
-  const formVariants = {
-    hidden: (direction) => ({
-      x: direction > 0 ? '100%' : '-100%',
-      opacity: 0,
-      transition: { duration: 0.4 }
-    }),
-    visible: {
-      x: '0%',
-      opacity: 1,
-      transition: { duration: 0.5 }
-    },
-    exit: (direction) => ({
-      x: direction > 0 ? '-100%' : '100%',
-      opacity: 0,
-      transition: { duration: 0.4 }
-    }),
-  };
-
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 animated-gradient">
       <div className="w-full max-w-lg mx-auto">
@@ -222,22 +205,16 @@ export default function SignupPage() {
             </p>
 
             <div className="relative h-2 bg-gray-700 rounded-full mb-8">
-              <motion.div
+              <div
                 className="absolute top-0 left-0 h-2 bg-blue-500 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: step === 1 ? '50%' : '100%' }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-              />
+                style={{ width: step === 1 ? '50%' : '100%' }}
+              ></div>
             </div>
 
             <AnimatePresence mode="wait" custom={direction}>
-              <motion.form
+              <div
                 key={step}
                 custom={direction}
-                variants={formVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
                 className="space-y-4"
               >
               {step === 1 && (
@@ -331,30 +308,29 @@ export default function SignupPage() {
 
               <div className="flex items-center justify-between pt-4">
                 {step === 1 ? ( <div></div> ) : (
-                  <motion.button type="button" onClick={prevStep} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-300">
+                  <button type="button" onClick={prevStep} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-300">
                     <FaArrowRight /> <span>رجوع</span>
-                  </motion.button>
+                  </button>
                 )}
                 
                 {step === 1 && (
-                  <motion.button type="button" onClick={nextStep} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-1/2 bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-2">
+                  <button type="button" onClick={nextStep} className="w-1/2 bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-2">
                     <span>التالي</span> <FaArrowLeft />
-                  </motion.button>
+                  </button>
                 )}
                 
                 {step === 2 && (
-                  <motion.button 
+                  <button 
                     type="button"
                     onClick={handleSubmit}
                     disabled={loading || !termsAccepted} 
-                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} 
                     className="w-1/2 bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300 flex items-center justify-center disabled:bg-gray-500 disabled:cursor-not-allowed"
                   >
                     {loading ? <Spinner /> : 'إنشاء الحساب'}
-                  </motion.button>
+                  </button>
                 )}
               </div>
-              </motion.form>
+              </div>
             </AnimatePresence>
 
             <p className="text-center text-gray-400 mt-6 text-sm">
@@ -370,15 +346,13 @@ export default function SignupPage() {
 }
 
 const InterestChip = ({ interest, selected, onChange }) => (
-  <motion.button
+  <button
     type="button"
     onClick={() => onChange(interest)}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
     className={`w-full text-sm text-center p-2 rounded-full border-2 transition-all duration-300 ${
       selected ? 'bg-blue-500 border-blue-500 text-white shadow-lg' : 'bg-gray-700 border-gray-600 hover:border-gray-500'
     }`}
   >
     {interest}
-  </motion.button>
+  </button>
 ); 
