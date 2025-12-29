@@ -1,9 +1,11 @@
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiMail, FiArrowLeft } from 'react-icons/fi';
+import { FiMail, FiArrowRight, FiCheckCircle } from 'react-icons/fi';
 import { supabase } from '../supabaseClient';
 import { useState } from 'react';
-import Spinner from '../components/Spinner';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import Alert from '../components/ui/Alert';
 
 export default function CheckEmailPage() {
     const location = useLocation();
@@ -12,14 +14,7 @@ export default function CheckEmailPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     
-    // Fallback if email is not passed in state
-    const email = location.state?.email || 'your email';
-
-    if (!location.state?.email) {
-        // Optional: Redirect if the page is accessed directly without context
-        // useEffect(() => { navigate('/signup'); }, [navigate]);
-        // For now, we'll just show a generic message.
-    }
+    const email = location.state?.email || 'بريدك الإلكتروني';
 
     const handleResendEmail = async () => {
         setLoading(true);
@@ -40,65 +35,119 @@ export default function CheckEmailPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
-            <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, type: 'spring' }}
-                className="w-full max-w-md bg-gray-800 rounded-2xl shadow-2xl p-8 text-center z-10"
-            >
-                <div className="flex justify-center mb-6">
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1, rotate: 360 }}
-                        transition={{ delay: 0.2, duration: 0.8, type: 'spring' }}
-                        className="bg-blue-600 p-4 rounded-full"
-                    >
-                        <FiMail className="w-10 h-10 text-white" />
-                    </motion.div>
-                </div>
-
-                <h1 className="text-3xl font-bold mb-4 text-blue-300">لقد أوشكت على الانتهاء!</h1>
-                <p className="text-gray-300 mb-2">
-                    لقد أرسلنا رابط تفعيل إلى بريدك الإلكتروني:
-                </p>
-                <p className="text-lg font-semibold text-yellow-400 mb-8 break-all">{email}</p>
-                <p className="text-gray-400 mb-8">
-                    الرجاء الضغط على الرابط الموجود في البريد الإلكتروني لتفعيل حسابك والبدء في رحلتك المهنية معنا.
-                </p>
-
-                <div className="space-y-4">
-                    <p className="text-sm text-gray-500">
-                        لم تستلم البريد؟ تحقق من مجلد الرسائل غير المرغوب فيها (Spam) أو حاول إعادة إرسال الرابط.
-                    </p>
-                    <button
-                        onClick={handleResendEmail}
-                        disabled={loading}
-                        className="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition duration-300 flex items-center justify-center disabled:bg-gray-500 disabled:cursor-not-allowed"
-                    >
-                        {loading ? <Spinner /> : 'إعادة إرسال رابط التفعيل'}
-                    </button>
-                    {message && <p className="text-green-400">{message}</p>}
-                    {error && <p className="text-red-400">{error}</p>}
-                </div>
-            </motion.div>
+        <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+            {/* Background decorations */}
+            <div className="absolute inset-0 mesh-gradient" />
+            <div className="absolute top-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-[var(--color-primary)]/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-emerald-500/10 rounded-full blur-3xl" />
             
-            <Link to="/signup" className="absolute top-8 left-8 text-gray-400 hover:text-white transition-colors flex items-center gap-2 z-10">
-                <FiArrowLeft />
-                <span>العودة إلى التسجيل</span>
-            </Link>
+            {/* Back link */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute top-6 right-6 z-10"
+            >
+                <Link 
+                    to="/signup" 
+                    className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors text-sm"
+                >
+                    <span>العودة للتسجيل</span>
+                    <FiArrowRight className="w-4 h-4" />
+                </Link>
+            </motion.div>
 
-             {/* Animated background elements */}
-            <motion.div 
-                className="absolute top-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full filter blur-3xl opacity-50"
-                animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
-                transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse' }}
-            />
-            <motion.div 
-                className="absolute bottom-0 right-0 w-72 h-72 bg-green-500/20 rounded-full filter blur-3xl opacity-50"
-                animate={{ x: [0, -100, 0], y: [0, -50, 0] }}
-                transition={{ duration: 25, repeat: Infinity, repeatType: 'reverse' }}
-            />
+            <div className="w-full max-w-md relative z-10">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <Card variant="glass" className="p-6 sm:p-8 text-center">
+                        {/* Icon */}
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                            className="flex justify-center mb-6"
+                        >
+                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] flex items-center justify-center shadow-xl shadow-[var(--color-primary)]/30">
+                                <FiMail className="w-10 h-10 text-white" />
+                            </div>
+                        </motion.div>
+
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-[var(--color-text-primary)]">
+                            تحقق من بريدك الإلكتروني
+                        </h1>
+                        <p className="text-[var(--color-text-secondary)] mb-2 text-sm sm:text-base">
+                            لقد أرسلنا رابط تفعيل إلى:
+                        </p>
+                        <p className="text-lg font-semibold text-[var(--color-primary)] mb-6 break-all">
+                            {email}
+                        </p>
+                        
+                        {/* Steps */}
+                        <div className="bg-[var(--color-surface-2)] rounded-xl p-4 mb-6 text-right">
+                            <div className="space-y-3">
+                                <div className="flex items-start gap-3">
+                                    <p className="text-sm text-[var(--color-text-secondary)] flex-1">افتح بريدك الإلكتروني</p>
+                                    <div className="w-6 h-6 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
+                                        <span className="text-xs font-bold text-[var(--color-primary)]">1</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <p className="text-sm text-[var(--color-text-secondary)] flex-1">ابحث عن رسالة من جلينت</p>
+                                    <div className="w-6 h-6 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
+                                        <span className="text-xs font-bold text-[var(--color-primary)]">2</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <p className="text-sm text-[var(--color-text-secondary)] flex-1">اضغط على رابط التفعيل</p>
+                                    <div className="w-6 h-6 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
+                                        <span className="text-xs font-bold text-[var(--color-primary)]">3</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Alerts */}
+                        {message && (
+                            <Alert variant="success" className="mb-4" dismissible onDismiss={() => setMessage('')}>
+                                <FiCheckCircle className="w-4 h-4" />
+                                {message}
+                            </Alert>
+                        )}
+                        {error && (
+                            <Alert variant="error" className="mb-4" dismissible onDismiss={() => setError('')}>
+                                {error}
+                            </Alert>
+                        )}
+
+                        {/* Actions */}
+                        <div className="space-y-3">
+                            <p className="text-xs text-[var(--color-text-muted)]">
+                                لم تستلم البريد؟ تحقق من مجلد الرسائل غير المرغوب فيها (Spam)
+                            </p>
+                            <Button
+                                variant="secondary"
+                                onClick={handleResendEmail}
+                                isLoading={loading}
+                                isFullWidth
+                            >
+                                إعادة إرسال رابط التفعيل
+                            </Button>
+                            
+                            <Button
+                                as={Link}
+                                to="/login"
+                                variant="ghost"
+                                isFullWidth
+                            >
+                                لدي حساب بالفعل - تسجيل الدخول
+                            </Button>
+                        </div>
+                    </Card>
+                </motion.div>
+            </div>
         </div>
     );
-} 
+}

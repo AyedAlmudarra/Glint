@@ -15,8 +15,8 @@ export const navLinks = [
     },
     { 
         icon: <FaRobot />, 
-        name: "عايد", 
-        path: "/ayed",
+        name: "سَند", 
+        path: "/sanad",
         roles: ['student'] 
     },
     { 

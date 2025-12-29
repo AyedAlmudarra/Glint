@@ -88,11 +88,11 @@ export default function OnboardingSurvey({ user, onComplete }) {
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.9, opacity: 0, y: 50 }}
                     transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                    className="bg-gray-800 rounded-2xl shadow-2xl mx-auto p-8 text-white my-8"
+                    className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-2xl shadow-2xl mx-auto p-8 text-[var(--color-text-primary)] my-8"
                 >
                     <div className="text-right">
-                        <h2 className="text-3xl font-bold text-blue-400 mb-2">مرحباً بك في جلينت، {user.user_metadata.first_name || 'يا صديقنا'}!</h2>
-                        <p className="text-gray-300 mb-8">لنخصص خريطة طريقك المهنية. إجاباتك ستساعدنا في إرشادك بشكل أفضل.</p>
+                        <h2 className="text-3xl font-bold text-[var(--color-accent-primary)] mb-2">مرحباً بك في جلينت، {user.user_metadata.first_name || 'يا صديقنا'}!</h2>
+                        <p className="text-[var(--color-text-secondary)] mb-8">لنخصص خريطة طريقك المهنية. إجاباتك ستساعدنا في إرشادك بشكل أفضل.</p>
                     </div>
                     
                     <form onSubmit={handleSubmit} className="space-y-8">
@@ -114,7 +114,7 @@ export default function OnboardingSurvey({ user, onComplete }) {
                             ))}
                         </QuestionBlock>
 
-                        {error && <p className="text-red-400 text-center">{error}</p>}
+                        {error && <p className="text-[var(--color-error)] text-center">{error}</p>}
 
                         <div className="flex justify-center pt-4">
                             <motion.button 
@@ -122,7 +122,7 @@ export default function OnboardingSurvey({ user, onComplete }) {
                                 disabled={loading}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="bg-green-600 text-white font-bold py-3 px-10 rounded-full hover:bg-green-700 transition duration-300 flex items-center justify-center gap-3 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                                className="bg-gradient-to-l from-[var(--color-accent-primary)] to-[var(--color-accent-secondary)] text-white font-bold py-3 px-10 rounded-full hover:opacity-90 transition duration-300 flex items-center justify-center gap-3 disabled:bg-[var(--color-text-muted)] disabled:cursor-not-allowed"
                             >
                                 {loading ? <Spinner /> : <><span>لنبدأ الرحلة</span> <FaPaperPlane /></>}
                             </motion.button>
@@ -137,8 +137,8 @@ export default function OnboardingSurvey({ user, onComplete }) {
 const QuestionBlock = ({ icon, title, children }) => (
     <fieldset>
         <legend className="flex items-center gap-3 mb-4">
-            <div className="text-blue-400 text-2xl">{icon}</div>
-            <h3 className="text-xl font-bold">{title}</h3>
+            <div className="text-[var(--color-accent-primary)] text-2xl">{icon}</div>
+            <h3 className="text-xl font-bold text-[var(--color-text-primary)]">{title}</h3>
         </legend>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {children}
@@ -147,7 +147,7 @@ const QuestionBlock = ({ icon, title, children }) => (
 );
 
 const RadioCard = ({ name, value, label, checked, onChange }) => (
-    <label className={`block p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${checked ? 'bg-blue-900/50 border-blue-500 shadow-lg' : 'bg-gray-700/50 border-gray-600 hover:border-gray-500'}`}>
+    <label className={`block p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${checked ? 'bg-[var(--color-accent-primary)]/20 border-[var(--color-accent-primary)] shadow-lg' : 'bg-[var(--color-bg-tertiary)] border-[var(--color-border-primary)] hover:border-[var(--color-border-secondary)]'}`}>
         <input 
             type="radio" 
             name={name} 
@@ -156,6 +156,6 @@ const RadioCard = ({ name, value, label, checked, onChange }) => (
             onChange={onChange}
             className="hidden"
         />
-        <span className="text-base">{label}</span>
+        <span className="text-base text-[var(--color-text-primary)]">{label}</span>
     </label>
 );

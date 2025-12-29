@@ -1,14 +1,116 @@
+/* ==========================================================================
+   GLINT - Main Stylesheet
+   نظام التصميم الرئيسي لمنصة جلينت
+   ========================================================================== */
+
+/* Import Design Tokens */
+@import "./styles/design-tokens.css";
+
+/* TailwindCSS */
 @import "tailwindcss";
 
+/* ==========================================================================
+   THEME CONFIGURATION - إعدادات السمة
+   ========================================================================== */
+
 @theme {
-  --font-sans: "Tajawal", sans-serif;
+  --font-sans: 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'Fira Code', 'Monaco', 'Consolas', monospace;
   --radius: 0.5rem;
 }
 
 @tailwind utilities;
 
+/* ==========================================================================
+   BASE STYLES - الأنماط الأساسية
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family-primary);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   TYPOGRAPHY CLASSES - فئات الطباعة
+   ========================================================================== */
+
+.text-display {
+  font-size: var(--font-size-6xl);
+  font-weight: var(--font-weight-extrabold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.text-h1 {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.text-h2 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-snug);
+}
+
+.text-h3 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+.text-h4 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+}
+
+.text-body-lg {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
+}
+
+.text-body {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+
+.text-body-sm {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.text-caption {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   ANIMATED BACKGROUNDS - الخلفيات المتحركة
+   ========================================================================== */
+
 .animated-gradient {
-  background: linear-gradient(-45deg, #0f172a, #1e3a8a, #3b82f6, #1e3a8a);
+  background: linear-gradient(
+    -45deg,
+    var(--color-bg-primary),
+    #1e3a5f,
+    var(--color-primary-dark),
+    #1e3a5f
+  );
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
 }
@@ -25,7 +127,610 @@
   }
 }
 
-.force-ltr .cm-content, .force-ltr .cm-gutter {
+/* Mesh Gradient Background */
+.mesh-gradient {
+  background-color: var(--color-bg-primary);
+  background-image: 
+    radial-gradient(at 40% 20%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(245, 158, 11, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+}
+
+/* Particle Background Animation */
+.particles-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.particles-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
+  animation: particles-float 20s ease-in-out infinite;
+}
+
+@keyframes particles-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(2deg);
+  }
+}
+
+/* ==========================================================================
+   CARD STYLES - أنماط البطاقات
+   ========================================================================== */
+
+.card {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-6);
+  transition: var(--transition-all);
+}
+
+.card:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-light);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.card-interactive {
+  cursor: pointer;
+}
+
+.card-interactive:active {
+  transform: translateY(0);
+}
+
+/* Glass Card */
+.card-glass {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-2xl);
+}
+
+/* Career Cards with Accent */
+.card-career {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-career::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--career-gradient, var(--color-primary));
+}
+
+.card-career-software { --career-gradient: var(--color-career-software-gradient); }
+.card-career-finance { --career-gradient: var(--color-career-finance-gradient); }
+.card-career-hr { --career-gradient: var(--color-career-hr-gradient); }
+.card-career-marketing { --career-gradient: var(--color-career-marketing-gradient); }
+
+/* ==========================================================================
+   BUTTON STYLES - أنماط الأزرار
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-all);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Button Sizes */
+.btn-sm {
+  font-size: var(--font-size-sm);
+  padding: var(--space-2) var(--space-4);
+}
+
+.btn-lg {
+  font-size: var(--font-size-lg);
+  padding: var(--space-4) var(--space-8);
+}
+
+.btn-xl {
+  font-size: var(--font-size-xl);
+  padding: var(--space-5) var(--space-10);
+  border-radius: var(--radius-xl);
+}
+
+/* Button Variants */
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow-primary);
+}
+
+.btn-primary:active:not(:disabled) {
+  background: var(--color-primary-active);
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-surface-3);
+  border-color: var(--color-border-light);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-surface-1);
+  color: var(--color-text-primary);
+}
+
+.btn-success {
+  background: var(--color-success);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: var(--color-success-dark);
+  box-shadow: var(--shadow-glow-success);
+}
+
+.btn-danger {
+  background: var(--color-error);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--color-error-dark);
+  box-shadow: var(--shadow-glow-error);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Icon Button */
+.btn-icon {
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+}
+
+.btn-icon-sm {
+  padding: var(--space-2);
+}
+
+.btn-icon-lg {
+  padding: var(--space-4);
+}
+
+/* Pill Button */
+.btn-pill {
+  border-radius: var(--radius-full);
+}
+
+/* ==========================================================================
+   FORM STYLES - أنماط النماذج
+   ========================================================================== */
+
+.input {
+  width: 100%;
+  background: var(--color-surface-1);
+  border: 2px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  transition: var(--transition-all);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--color-border-light);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input-error {
+  border-color: var(--color-error);
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+}
+
+.input-success {
+  border-color: var(--color-success);
+}
+
+/* Input with Icon */
+.input-with-icon {
+  padding-right: var(--space-10);
+}
+
+[dir="rtl"] .input-with-icon {
+  padding-right: var(--space-10);
+  padding-left: var(--space-4);
+}
+
+/* Textarea */
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Select */
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394A3B8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: left var(--space-3) center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-left: var(--space-10);
+}
+
+[dir="rtl"] .select {
+  background-position: right var(--space-3) center;
+  padding-right: var(--space-10);
+  padding-left: var(--space-4);
+}
+
+/* Label */
+.label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+/* Helper Text */
+.helper-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.error-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+  margin-top: var(--space-1);
+}
+
+/* ==========================================================================
+   BADGE STYLES - أنماط الشارات
+   ========================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-1) var(--space-2-5);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.badge-primary {
+  background: var(--color-primary-glow);
+  color: var(--color-primary-light);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.badge-success {
+  background: var(--color-success-bg);
+  color: var(--color-success-light);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-light);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-error {
+  background: var(--color-error-bg);
+  color: var(--color-error-light);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-neutral {
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
+}
+
+/* Skill Badge */
+.badge-skill {
+  background: var(--color-primary-glow);
+  color: var(--color-primary-light);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: var(--space-1-5) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+/* ==========================================================================
+   PROGRESS STYLES - أنماط التقدم
+   ========================================================================== */
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-500) var(--ease-out);
+}
+
+.progress-bar-fill-success {
+  background: var(--color-success);
+}
+
+.progress-bar-animated .progress-bar-fill {
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-primary-light) 50%,
+    var(--color-primary) 100%
+  );
+  background-size: 200% 100%;
+  animation: progress-shine 2s linear infinite;
+}
+
+@keyframes progress-shine {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ==========================================================================
+   CODE EDITOR STYLES - أنماط محرر الكود
+   ========================================================================== */
+
+.force-ltr .cm-content,
+.force-ltr .cm-gutter {
   direction: ltr !important;
   text-align: left !important;
+}
+
+.code-block {
+  font-family: var(--font-family-mono);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  overflow-x: auto;
+}
+
+/* ==========================================================================
+   SKELETON LOADING - التحميل الهيكلي
+   ========================================================================== */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-1) 25%,
+    var(--color-surface-2) 50%,
+    var(--color-surface-1) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: var(--space-2);
+}
+
+.skeleton-title {
+  height: 1.5em;
+  width: 60%;
+  margin-bottom: var(--space-3);
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+}
+
+.skeleton-card {
+  height: 200px;
+}
+
+/* ==========================================================================
+   TOAST/NOTIFICATION STYLES - أنماط الإشعارات
+   ========================================================================== */
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  max-width: 400px;
+}
+
+.toast-success {
+  border-right: 4px solid var(--color-success);
+}
+
+.toast-error {
+  border-right: 4px solid var(--color-error);
+}
+
+.toast-warning {
+  border-right: 4px solid var(--color-warning);
+}
+
+.toast-info {
+  border-right: 4px solid var(--color-info);
+}
+
+[dir="rtl"] .toast-success,
+[dir="rtl"] .toast-error,
+[dir="rtl"] .toast-warning,
+[dir="rtl"] .toast-info {
+  border-right: none;
+  border-left: 4px solid;
+}
+
+[dir="rtl"] .toast-success { border-left-color: var(--color-success); }
+[dir="rtl"] .toast-error { border-left-color: var(--color-error); }
+[dir="rtl"] .toast-warning { border-left-color: var(--color-warning); }
+[dir="rtl"] .toast-info { border-left-color: var(--color-info); }
+
+/* ==========================================================================
+   DIVIDER - الفاصل
+   ========================================================================== */
+
+.divider {
+  height: 1px;
+  background: var(--color-border-default);
+  margin: var(--space-6) 0;
+}
+
+.divider-vertical {
+  width: 1px;
+  height: 100%;
+  background: var(--color-border-default);
+  margin: 0 var(--space-4);
+}
+
+/* ==========================================================================
+   UTILITY OVERRIDES - تجاوزات المساعدة
+   ========================================================================== */
+
+/* Hide arrows from number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Selection Color */
+::selection {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Focus Visible */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   RESPONSIVE UTILITIES - أدوات التجاوب
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .text-display {
+    font-size: var(--font-size-4xl);
+  }
+  
+  .text-h1 {
+    font-size: var(--font-size-3xl);
+  }
+  
+  .text-h2 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .hide-desktop {
+    display: none !important;
+  }
 }

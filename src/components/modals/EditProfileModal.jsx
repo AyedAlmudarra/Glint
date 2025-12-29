@@ -83,52 +83,52 @@ const EditProfileModal = ({ isOpen, onClose, user, onProfileUpdate }) => {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.9, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="bg-gray-800 border border-gray-700 rounded-2xl shadow-lg p-8 w-full max-w-lg text-right"
+                    className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-2xl shadow-lg p-8 w-full max-w-lg text-right"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 flex-shrink-0 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12 flex-shrink-0 bg-[var(--color-accent-primary)]/20 text-[var(--color-accent-primary)] rounded-full flex items-center justify-center">
                             <FaUser size={24} />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-white">تعديل الملف الشخصي</h2>
-                            <p className="text-gray-400">قم بتحديث اسمك الأول والأخير.</p>
+                            <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">تعديل الملف الشخصي</h2>
+                            <p className="text-[var(--color-text-secondary)]">قم بتحديث اسمك الأول والأخير.</p>
                         </div>
                     </div>
 
                     <form onSubmit={handleSave}>
                         <div className="space-y-4">
                             <div>
-                                <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-1">الاسم الأول</label>
+                                <label htmlFor="firstName" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">الاسم الأول</label>
                                 <input
                                     id="firstName"
                                     type="text"
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
-                                    className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border-primary)] rounded-lg p-3 text-[var(--color-text-primary)] focus:ring-2 focus:ring-[var(--color-accent-primary)] focus:border-[var(--color-accent-primary)] focus:outline-none"
                                     disabled={isUpdating}
                                 />
                             </div>
                              <div>
-                                <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-1">الاسم الأخير</label>
+                                <label htmlFor="lastName" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">الاسم الأخير</label>
                                 <input
                                     id="lastName"
                                     type="text"
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
-                                    className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border-primary)] rounded-lg p-3 text-[var(--color-text-primary)] focus:ring-2 focus:ring-[var(--color-accent-primary)] focus:border-[var(--color-accent-primary)] focus:outline-none"
                                     disabled={isUpdating}
                                 />
                             </div>
                         </div>
 
-                        {error && <p className="text-red-400 text-sm mt-4 text-center">{error}</p>}
+                        {error && <p className="text-[var(--color-error)] text-sm mt-4 text-center">{error}</p>}
 
                         <div className="mt-8 flex justify-start gap-4">
                             <button
                                 type="submit"
                                 disabled={isUpdating}
-                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="bg-[var(--color-accent-primary)] hover:opacity-90 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {isUpdating ? <Spinner /> : <FaSave />}
                                 <span>{isUpdating ? 'جاري الحفظ...' : 'حفظ التغييرات'}</span>
@@ -137,7 +137,7 @@ const EditProfileModal = ({ isOpen, onClose, user, onProfileUpdate }) => {
                                 type="button"
                                 onClick={onClose}
                                 disabled={isUpdating}
-                                className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                                className="bg-[var(--color-bg-tertiary)] hover:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] font-bold py-3 px-6 rounded-lg transition-all border border-[var(--color-border-primary)]"
                             >
                                 إلغاء
                             </button>

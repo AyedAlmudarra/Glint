@@ -18,29 +18,29 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, children }) => {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.9, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="bg-gray-800 border border-gray-700 rounded-2xl shadow-lg p-8 w-full max-w-md text-right"
+                    className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-2xl shadow-lg p-8 w-full max-w-md text-right"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 flex-shrink-0 bg-yellow-500/20 text-yellow-400 rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12 flex-shrink-0 bg-[var(--color-warning)]/20 text-[var(--color-warning)] rounded-full flex items-center justify-center">
                             <FaExclamationTriangle size={24} />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
-                            <p className="text-gray-400 leading-relaxed">{children}</p>
+                            <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">{title}</h2>
+                            <p className="text-[var(--color-text-secondary)] leading-relaxed">{children}</p>
                         </div>
                     </div>
                     
                     <div className="mt-8 flex justify-start gap-4">
                         <button
                             onClick={onConfirm}
-                            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                            className="bg-[var(--color-error)] hover:opacity-90 text-white font-bold py-2 px-6 rounded-lg transition-all"
                         >
                             تأكيد
                         </button>
                         <button
                             onClick={onClose}
-                            className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                            className="bg-[var(--color-bg-tertiary)] hover:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] font-bold py-2 px-6 rounded-lg transition-all border border-[var(--color-border-primary)]"
                         >
                             إلغاء
                         </button>

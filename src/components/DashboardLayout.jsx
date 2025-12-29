@@ -4,7 +4,7 @@ import { TourProvider } from "../context/TourContext";
 import TourGuide from "./TourGuide";
 import DashboardHeader from './DashboardHeader';
 
-export default function DashboardLayout({ children, simulationTitle, tasks, currentTaskId, userProgress }) {
+export default function DashboardLayout({ children, simulationTitle, tasks, currentTaskId, userProgress, hideSidebar = false }) {
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const sidebarRef = useRef(null);
   const openSidebarButtonRef = useRef(null);
@@ -22,9 +22,20 @@ export default function DashboardLayout({ children, simulationTitle, tasks, curr
     }
   }, [isMobileNavOpen]);
 
+  // Immersive mode (no sidebar) for focused task experience
+  if (hideSidebar) {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">
+        <main className="flex-1">
+          {children}
+        </main>
+      </div>
+    );
+  }
+
   return (
     <TourProvider>
-      <div className="flex bg-gray-900 text-white min-h-screen">
+      <div className="flex bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] min-h-screen">
         <Sidebar 
           ref={sidebarRef}
           isMobileOpen={isMobileNavOpen}
@@ -36,7 +47,7 @@ export default function DashboardLayout({ children, simulationTitle, tasks, curr
         />
         <div className="flex-1 flex flex-col overflow-auto">
           <DashboardHeader openSidebarButtonRef={openSidebarButtonRef} onOpenSidebar={() => setMobileNavOpen(true)} />
-          <main className="flex-1 p-6">
+          <main className="flex-1">
             {children}
           </main>
         </div>

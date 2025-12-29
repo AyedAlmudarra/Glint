@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaGraduationCap, FaArrowRight, FaArrowLeft, FaEye, FaEyeSlash, FaUserPlus } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaGraduationCap, FaArrowRight, FaArrowLeft, FaCheckCircle, FaRocket } from 'react-icons/fa';
 import { supabase } from '../supabaseClient';
-import { AnimatePresence, motion } from 'framer-motion';
-import Spinner from '../components/Spinner';
-import InputField from '../components/forms/InputField';
+import { motion, AnimatePresence } from 'framer-motion';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import Card from '../components/ui/Card';
+import Badge from '../components/ui/Badge';
+import Alert from '../components/ui/Alert';
 
 const interestOptions = [
-  "التكنولوجيا والبرمجة",
-  "الأعمال والمالية",
-  "الفنون والتصميم الإبداعي",
-  "الرعاية الصحية والعلوم",
-  "الهندسة والتصنيع",
-  "التسويق والتواصل"
+  { id: 'tech', label: 'التكنولوجيا والبرمجة', icon: '💻' },
+  { id: 'business', label: 'الأعمال والمالية', icon: '📊' },
+  { id: 'arts', label: 'الفنون والتصميم الإبداعي', icon: '🎨' },
+  { id: 'health', label: 'الرعاية الصحية والعلوم', icon: '🔬' },
+  { id: 'engineering', label: 'الهندسة والتصنيع', icon: '⚙️' },
+  { id: 'marketing', label: 'التسويق والتواصل', icon: '📢' },
 ];
 
 const PasswordStrengthMeter = ({ password }) => {
@@ -28,32 +31,70 @@ const PasswordStrengthMeter = ({ password }) => {
     return { strength, checks };
   };
 
-  const { strength } = checkPasswordStrength();
+  const { strength, checks } = checkPasswordStrength();
   
   if (!password) return null;
 
   const strengthLevels = [
-    { text: 'ضعيف جداً', color: 'text-red-500', bgColor: 'bg-red-500' },
-    { text: 'ضعيف', color: 'text-red-500', bgColor: 'bg-red-500' },
-    { text: 'مقبول', color: 'text-orange-500', bgColor: 'bg-orange-500' },
-    { text: 'جيد', color: 'text-yellow-500', bgColor: 'bg-yellow-500' },
-    { text: 'قوي', color: 'text-green-500', bgColor: 'bg-green-500' },
-    { text: 'قوي جداً', color: 'text-green-500', bgColor: 'bg-green-500' },
+    { text: 'ضعيف جداً', color: 'text-red-400', bgColor: 'bg-red-500' },
+    { text: 'ضعيف', color: 'text-red-400', bgColor: 'bg-red-500' },
+    { text: 'مقبول', color: 'text-amber-400', bgColor: 'bg-amber-500' },
+    { text: 'جيد', color: 'text-yellow-400', bgColor: 'bg-yellow-500' },
+    { text: 'قوي', color: 'text-emerald-400', bgColor: 'bg-emerald-500' },
+    { text: 'ممتاز', color: 'text-emerald-400', bgColor: 'bg-emerald-500' },
   ];
 
   const level = strengthLevels[strength];
 
   return (
-    <div className="space-y-2 mt-2 text-right">
-       <div className="flex justify-between items-center">
-        <p className={`text-xs font-bold ${level.color}`}>{level.text}</p>
-        <div className="w-2/3 bg-gray-600 rounded-full h-1.5">
-          <div className={`h-1.5 rounded-full transition-all duration-300 ${level.bgColor}`} style={{ width: `${(strength / 5) * 100}%` }}></div>
+    <div className="mt-3 space-y-2">
+      <div className="flex items-center justify-between gap-4">
+        <span className={`text-xs font-medium ${level.color}`}>{level.text}</span>
+        <div className="flex-1 h-1.5 bg-[var(--color-surface-2)] rounded-full overflow-hidden">
+          <motion.div
+            className={`h-full rounded-full ${level.bgColor}`}
+            initial={{ width: 0 }}
+            animate={{ width: `${(strength / 5) * 100}%` }}
+            transition={{ duration: 0.3 }}
+          />
         </div>
+      </div>
+      
+      <div className="flex flex-wrap gap-2 justify-end text-xs">
+        <span className={checks.length ? 'text-emerald-400' : 'text-[var(--color-text-muted)]'}>
+          {checks.length ? '✓' : '○'} 8 أحرف
+        </span>
+        <span className={checks.uppercase ? 'text-emerald-400' : 'text-[var(--color-text-muted)]'}>
+          {checks.uppercase ? '✓' : '○'} حرف كبير
+        </span>
+        <span className={checks.number ? 'text-emerald-400' : 'text-[var(--color-text-muted)]'}>
+          {checks.number ? '✓' : '○'} رقم
+        </span>
       </div>
     </div>
   );
 };
+
+const InterestChip = ({ interest, selected, onChange }) => (
+  <motion.button
+    type="button"
+    onClick={() => onChange(interest.label)}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    className={`
+      w-full text-sm text-right p-3 rounded-xl border-2 transition-all duration-200
+      flex items-center gap-3
+      ${selected 
+        ? 'bg-[var(--color-primary)]/20 border-[var(--color-primary)] text-white' 
+        : 'bg-[var(--color-surface-1)] border-[var(--color-border-default)] hover:border-[var(--color-border-light)] text-[var(--color-text-secondary)]'
+      }
+    `}
+  >
+    <span className="text-xl">{interest.icon}</span>
+    <span className="flex-1">{interest.label}</span>
+    {selected && <FaCheckCircle className="text-[var(--color-primary)]" />}
+  </motion.button>
+);
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -71,23 +112,22 @@ export default function SignupPage() {
   });
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const validateEmail = (email) => {
-    if (!email) {
-      return "البريد الإلكتروني مطلوب.";
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      return "صيغة البريد الإلكتروني غير صحيحة.";
-    }
+    if (!email) return "البريد الإلكتروني مطلوب.";
+    if (!/\S+@\S+\.\S+/.test(email)) return "صيغة البريد الإلكتروني غير صحيحة.";
     return null;
-  }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error on change
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleBlur = (e) => {
@@ -107,6 +147,9 @@ export default function SignupPage() {
         : [...prev.interests, interest];
       return { ...prev, interests: newInterests };
     });
+    if (errors.interests) {
+      setErrors((prev) => ({ ...prev, interests: null }));
+    }
   };
 
   const nextStep = () => {
@@ -154,12 +197,10 @@ export default function SignupPage() {
     setErrors(step2Errors);
     setTouched(prev => ({ ...prev, dateOfBirth: true, educationLevel: true, interests: true, terms: true }));
     
-    if (Object.keys(step2Errors).length > 0) {
-      return;
-    }
+    if (Object.keys(step2Errors).length > 0) return;
     
     setLoading(true);
-    setErrors({}); // Clear previous errors
+    setErrors({});
 
     const { data, error } = await supabase.auth.signUp({
       email: formData.email,
@@ -191,45 +232,98 @@ export default function SignupPage() {
 
   const formVariants = {
     hidden: (direction) => ({
-      x: direction > 0 ? '100%' : '-100%',
+      x: direction > 0 ? '50px' : '-50px',
       opacity: 0,
-      transition: { duration: 0.4 }
     }),
     visible: {
-      x: '0%',
+      x: 0,
       opacity: 1,
-      transition: { duration: 0.5 }
+      transition: { duration: 0.3, ease: 'easeOut' }
     },
     exit: (direction) => ({
-      x: direction > 0 ? '-100%' : '100%',
+      x: direction > 0 ? '-50px' : '50px',
       opacity: 0,
-      transition: { duration: 0.4 }
+      transition: { duration: 0.2 }
     }),
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 animated-gradient">
-      <div className="w-full max-w-lg mx-auto">
-        <div className="text-center mb-6">
-           <h1 className="text-4xl font-bold text-white">Glint</h1>
-        </div>
-        <div className="bg-gray-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full transition-all duration-500 overflow-hidden">
-            <h2 className="text-3xl font-bold text-center mb-2 text-blue-400">
-              {step === 1 ? 'إنشاء حساب جديد' : 'تخصيص رحلتك'}
-            </h2>
-            <p className="text-center text-gray-300 mb-6">
-              {step === 1 ? 'لنبدأ في بناء مستقبلك المهني.' : 'ساعدنا في تخصيص تجربتك.'}
-            </p>
-
-            <div className="relative h-2 bg-gray-700 rounded-full mb-8">
-              <motion.div
-                className="absolute top-0 left-0 h-2 bg-blue-500 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: step === 1 ? '50%' : '100%' }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-              />
+    <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute inset-0 mesh-gradient" />
+      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-[var(--color-primary)]/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
+      
+      {/* Back to home link */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="absolute top-6 right-6 z-20"
+      >
+        <Link 
+          to="/" 
+          className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+        >
+          <span>الرئيسية</span>
+          <FaArrowLeft className="w-4 h-4" />
+        </Link>
+      </motion.div>
+      
+      <div className="w-full max-w-lg mx-auto relative z-10">
+        {/* Logo */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-6"
+        >
+          <Link to="/" className="inline-block">
+            <img 
+              src="/GlintFullLogoWhite.png" 
+              alt="Glint" 
+              className="h-12 w-auto mx-auto"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          </Link>
+        </motion.div>
+        
+        {/* Signup Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Card variant="glass" className="p-8">
+            {/* Header */}
+            <div className="text-center mb-6">
+              <Badge variant="success" className="mb-3">
+                <FaRocket className="w-3 h-3" />
+                مجاني للأبد
+              </Badge>
+              <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">
+                {step === 1 ? 'إنشاء حساب جديد' : 'تخصيص رحلتك'}
+              </h2>
+              <p className="text-[var(--color-text-secondary)] text-sm">
+                {step === 1 ? 'لنبدأ في بناء مستقبلك المهني' : 'ساعدنا في تخصيص تجربتك'}
+              </p>
             </div>
 
+            {/* Progress bar */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between text-xs text-[var(--color-text-muted)] mb-2">
+                <span>الخطوة {step} من 2</span>
+                <span>{step === 1 ? 'معلومات الحساب' : 'التفضيلات'}</span>
+              </div>
+              <div className="h-2 bg-[var(--color-surface-2)] rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-l from-[var(--color-primary)] to-[var(--color-primary-light)] rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: step === 1 ? '50%' : '100%' }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                />
+              </div>
+            </div>
+
+            {/* Form */}
             <AnimatePresence mode="wait" custom={direction}>
               <motion.form
                 key={step}
@@ -240,145 +334,232 @@ export default function SignupPage() {
                 exit="exit"
                 className="space-y-4"
               >
-              {step === 1 && (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InputField name="firstName" type="text" placeholder="الاسم الأول" value={formData.firstName} onChange={handleChange} onBlur={handleBlur} icon={<FaUser />} error={errors.firstName} touched={touched.firstName} />
-                    <InputField name="lastName" type="text" placeholder="اسم العائلة" value={formData.lastName} onChange={handleChange} onBlur={handleBlur} icon={<FaUser />} error={errors.lastName} touched={touched.lastName} />
-                  </div>
-                  <InputField name="email" type="email" placeholder="البريد الإلكتروني" value={formData.email} onChange={handleChange} onBlur={handleBlur} icon={<FaEnvelope />} error={errors.email} touched={touched.email} />
-                  
-                  <div>
-                    <InputField 
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="كلمة المرور"
-                      value={formData.password}
+                {step === 1 && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        name="firstName"
+                        label="الاسم الأول"
+                        placeholder="أحمد"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        icon={<FaUser className="w-4 h-4" />}
+                        error={touched.firstName && errors.firstName}
+                        required
+                      />
+                      <Input
+                        name="lastName"
+                        label="اسم العائلة"
+                        placeholder="محمد"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        icon={<FaUser className="w-4 h-4" />}
+                        error={touched.lastName && errors.lastName}
+                        required
+                      />
+                    </div>
+                    
+                    <Input
+                      name="email"
+                      type="email"
+                      label="البريد الإلكتروني"
+                      placeholder="you@example.com"
+                      value={formData.email}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      icon={<FaLock />}
-                      error={errors.password}
-                      touched={touched.password}
-                      isPassword={true}
-                      showPassword={showPassword}
-                      onToggleShowPassword={() => setShowPassword(!showPassword)}
+                      icon={<FaEnvelope className="w-4 h-4" />}
+                      error={touched.email && errors.email}
+                      required
                     />
-                    <PasswordStrengthMeter password={formData.password} />
-                  </div>
+                    
+                    <div>
+                      <Input
+                        name="password"
+                        type="password"
+                        label="كلمة المرور"
+                        placeholder="••••••••"
+                        value={formData.password}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        icon={<FaLock className="w-4 h-4" />}
+                        error={touched.password && errors.password}
+                        required
+                      />
+                      <PasswordStrengthMeter password={formData.password} />
+                    </div>
 
-                  <div>
-                    <InputField 
+                    <Input
                       name="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      placeholder="تأكيد كلمة المرور"
+                      type="password"
+                      label="تأكيد كلمة المرور"
+                      placeholder="••••••••"
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      icon={<FaLock />}
-                      error={errors.confirmPassword}
-                      touched={touched.confirmPassword}
-                      isPassword={true}
-                      showPassword={showConfirmPassword}
-                      onToggleShowPassword={() => setShowConfirmPassword(!showConfirmPassword)}
+                      icon={<FaLock className="w-4 h-4" />}
+                      error={touched.confirmPassword && errors.confirmPassword}
+                      required
                     />
-                  </div>
-                </>
-              )}
-
-              {step === 2 && (
-                <>
-                  <InputField name="dateOfBirth" type="date" value={formData.dateOfBirth} onChange={handleChange} icon={<FaBirthdayCake />} label="تاريخ الميلاد" error={errors.dateOfBirth} touched={touched.dateOfBirth} onBlur={handleBlur} />
-                  
-                  <div>
-                    <div className="relative">
-                      <FaGraduationCap className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <select name="educationLevel" value={formData.educationLevel} onChange={handleChange} onBlur={handleBlur}
-                        className={`w-full bg-gray-700/50 border rounded-lg py-3 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 text-right ${errors.educationLevel ? 'border-red-500 focus:ring-red-500' : 'border-gray-600 focus:ring-blue-500'}`} >
-                        <option value="" disabled>المستوى التعليمي</option>
-                        <option value="middle_school">طالب في المرحلة المتوسطة</option>
-                        <option value="high_school">طالب في المرحلة الثانوية</option>
-                        <option value="undergraduate">طالب جامعي (بكالوريوس)</option>
-                        <option value="postgraduate">طالب دراسات عليا</option>
-                        <option value="graduate">خريج / خارج مقاعد الدراسة</option>
-                      </select>
-                    </div>
-                    {touched.educationLevel && errors.educationLevel && <p className="text-red-400 text-xs text-right mt-1">{errors.educationLevel}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-gray-300 mb-2 text-right">مجالات الاهتمام</label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {interestOptions.map((interest) => (
-                        <InterestChip key={interest} interest={interest} selected={formData.interests.includes(interest)} onChange={handleInterestChange} />
-                      ))}
-                    </div>
-                     <p className="text-xs text-gray-500 mt-2 text-right">اختر واحدًا أو أكثر. يساعدنا هذا فيแนะนำ المحاكاة المناسبة لك.</p>
-                     {touched.interests && errors.interests && <p className="text-red-400 text-xs text-right mt-1">{errors.interests}</p>}
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center justify-end gap-2">
-                      <label htmlFor="terms" className="text-sm text-gray-300">
-                        أوافق على <Link to="/terms" target="_blank" className="text-blue-400 hover:underline">شروط الخدمة</Link> و <Link to="/privacy" target="_blank" className="text-blue-400 hover:underline">سياسة الخصوصية</Link>
-                      </label>
-                      <input type="checkbox" id="terms" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)}
-                        className="h-4 w-4 rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-500" />
-                    </div>
-                    {touched.terms && errors.terms && <p className="text-red-400 text-xs text-right mt-1">{errors.terms}</p>}
-                  </div>
-                </>
-              )}
-
-              <div className="flex items-center justify-between pt-4">
-                {step === 1 ? ( <div></div> ) : (
-                  <motion.button type="button" onClick={prevStep} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-300">
-                    <FaArrowRight /> <span>رجوع</span>
-                  </motion.button>
+                  </>
                 )}
-                
-                {step === 1 && (
-                  <motion.button type="button" onClick={nextStep} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-1/2 bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-2">
-                    <span>التالي</span> <FaArrowLeft />
-                  </motion.button>
-                )}
-                
+
                 {step === 2 && (
-                  <motion.button 
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={loading || !termsAccepted} 
-                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} 
-                    className="w-1/2 bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300 flex items-center justify-center disabled:bg-gray-500 disabled:cursor-not-allowed"
-                  >
-                    {loading ? <Spinner /> : 'إنشاء الحساب'}
-                  </motion.button>
+                  <>
+                    <Input
+                      name="dateOfBirth"
+                      type="date"
+                      label="تاريخ الميلاد"
+                      value={formData.dateOfBirth}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      icon={<FaBirthdayCake className="w-4 h-4" />}
+                      error={touched.dateOfBirth && errors.dateOfBirth}
+                      required
+                    />
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2 text-right">
+                        المستوى التعليمي <span className="text-[var(--color-error)]">*</span>
+                      </label>
+                      <div className="relative">
+                        <FaGraduationCap className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] w-4 h-4" />
+                        <select
+                          name="educationLevel"
+                          value={formData.educationLevel}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          className={`
+                            w-full bg-[var(--color-surface-1)] border-2 rounded-lg py-3 px-4 pr-10
+                            text-[var(--color-text-primary)] text-right
+                            transition-all duration-200 focus:outline-none
+                            ${errors.educationLevel 
+                              ? 'border-[var(--color-error)] focus:border-[var(--color-error)]' 
+                              : 'border-[var(--color-border-default)] focus:border-[var(--color-primary)]'
+                            }
+                          `}
+                        >
+                          <option value="" disabled>اختر المستوى التعليمي</option>
+                          <option value="middle_school">طالب في المرحلة المتوسطة</option>
+                          <option value="high_school">طالب في المرحلة الثانوية</option>
+                          <option value="undergraduate">طالب جامعي (بكالوريوس)</option>
+                          <option value="postgraduate">طالب دراسات عليا</option>
+                          <option value="graduate">خريج / خارج مقاعد الدراسة</option>
+                        </select>
+                      </div>
+                      {touched.educationLevel && errors.educationLevel && (
+                        <p className="text-[var(--color-error)] text-sm text-right mt-1">{errors.educationLevel}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-3 text-right">
+                        مجالات الاهتمام <span className="text-[var(--color-error)]">*</span>
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {interestOptions.map((interest) => (
+                          <InterestChip
+                            key={interest.id}
+                            interest={interest}
+                            selected={formData.interests.includes(interest.label)}
+                            onChange={handleInterestChange}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-xs text-[var(--color-text-muted)] mt-2 text-right">
+                        اختر واحدًا أو أكثر لتخصيص تجربتك
+                      </p>
+                      {touched.interests && errors.interests && (
+                        <p className="text-[var(--color-error)] text-sm text-right mt-1">{errors.interests}</p>
+                      )}
+                    </div>
+                    
+                    <div className="pt-2">
+                      <label className="flex items-center justify-end gap-3 cursor-pointer">
+                        <span className="text-sm text-[var(--color-text-secondary)]">
+                          أوافق على{' '}
+                          <Link to="/terms" target="_blank" className="text-[var(--color-primary)] hover:underline">
+                            شروط الخدمة
+                          </Link>
+                          {' '}و{' '}
+                          <Link to="/privacy" target="_blank" className="text-[var(--color-primary)] hover:underline">
+                            سياسة الخصوصية
+                          </Link>
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={termsAccepted}
+                          onChange={(e) => setTermsAccepted(e.target.checked)}
+                          className="w-5 h-5 rounded bg-[var(--color-surface-1)] border-[var(--color-border-default)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                        />
+                      </label>
+                      {touched.terms && errors.terms && (
+                        <p className="text-[var(--color-error)] text-sm text-right mt-1">{errors.terms}</p>
+                      )}
+                    </div>
+                  </>
                 )}
-              </div>
+
+                {errors.submit && (
+                  <Alert variant="error" dismissible onDismiss={() => setErrors(prev => ({ ...prev, submit: null }))}>
+                    {errors.submit}
+                  </Alert>
+                )}
+
+                {/* Navigation buttons */}
+                <div className="flex items-center justify-between pt-4 gap-4">
+                  {step === 1 ? (
+                    <div />
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={prevStep}
+                      icon={<FaArrowRight className="w-4 h-4" />}
+                    >
+                      رجوع
+                    </Button>
+                  )}
+                  
+                  {step === 1 ? (
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="lg"
+                      onClick={nextStep}
+                      icon={<FaArrowLeft className="w-4 h-4" />}
+                      iconPosition="end"
+                      className="flex-1"
+                    >
+                      التالي
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="success"
+                      size="lg"
+                      onClick={handleSubmit}
+                      isLoading={loading}
+                      isDisabled={!termsAccepted}
+                      className="flex-1"
+                    >
+                      إنشاء الحساب
+                    </Button>
+                  )}
+                </div>
               </motion.form>
             </AnimatePresence>
 
-            <p className="text-center text-gray-400 mt-6 text-sm">
+            <p className="text-center text-[var(--color-text-secondary)] mt-6 text-sm">
               هل لديك حساب بالفعل؟{' '}
-              <Link to="/login" className="font-bold text-blue-400 hover:underline">
+              <Link to="/login" className="font-semibold text-[var(--color-primary)] hover:underline">
                 تسجيل الدخول
               </Link>
             </p>
-          </div>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );
 }
-
-const InterestChip = ({ interest, selected, onChange }) => (
-  <motion.button
-    type="button"
-    onClick={() => onChange(interest)}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className={`w-full text-sm text-center p-2 rounded-full border-2 transition-all duration-300 ${
-      selected ? 'bg-blue-500 border-blue-500 text-white shadow-lg' : 'bg-gray-700 border-gray-600 hover:border-gray-500'
-    }`}
-  >
-    {interest}
-  </motion.button>
-); 

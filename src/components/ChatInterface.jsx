@@ -1,68 +1,154 @@
 import { useState, useRef, useEffect } from 'react';
-import { FaPaperPlane, FaRobot, FaCopy, FaThumbsUp, FaThumbsDown, FaTrash } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaPaperPlane, FaRobot, FaCopy, FaThumbsUp, FaThumbsDown, FaTrash, FaUser, FaCheckCircle } from 'react-icons/fa';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import ConfirmModal from './modals/ConfirmModal';
 import { useUserProfile } from '../hooks/useUserProfile';
+import Card from './ui/Card';
+import Button from './ui/Button';
+import Badge from './ui/Badge';
+import Avatar from './ui/Avatar';
+import { NoChatEmpty } from './ui/EmptyState';
+
+const TypingIndicator = () => (
+    <div className="flex items-center gap-1.5 px-4 py-2">
+        <motion.div
+            className="w-2 h-2 rounded-full bg-[var(--color-primary)]"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+        />
+        <motion.div
+            className="w-2 h-2 rounded-full bg-[var(--color-primary)]"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+        />
+        <motion.div
+            className="w-2 h-2 rounded-full bg-[var(--color-primary)]"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+        />
+    </div>
+);
 
 const ChatMessage = ({ msg, onFeedback, onCopy, isCopied, feedbackStatus }) => {
     const isUser = msg.sender === 'user';
-
-    const handleFeedbackClick = (rating) => {
-        if (feedbackStatus) return; // Don't allow re-submitting
-        onFeedback(msg.id, rating);
-    };
+    const isLoading = msg.content === 'loading';
 
     return (
-        <div className={`flex items-start gap-4 my-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
-            {!isUser && (
-                <div className="bg-blue-600 rounded-full p-3">
-                    <FaRobot className="text-white" />
-                </div>
-            )}
-            <div className={`group relative max-w-xl p-4 rounded-xl whitespace-pre-wrap ${isUser ? 'bg-gray-700 text-white' : 'bg-gray-800 text-gray-300'}`}>
-                {msg.content === 'loading' ? (
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse [animation-delay:0.2s]"></div>
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse [animation-delay:0.4s]"></div>
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className={`flex items-start gap-3 my-4 ${isUser ? 'flex-row-reverse' : ''}`}
+        >
+            {/* Avatar */}
+            <div className={`shrink-0 ${isUser ? '' : ''}`}>
+                {isUser ? (
+                    <div className="w-10 h-10 rounded-xl bg-[var(--color-surface-2)] flex items-center justify-center">
+                        <FaUser className="text-[var(--color-text-muted)]" />
                     </div>
                 ) : (
-                    <p>{msg.content}</p>
-                )}
-                {!isUser && msg.content !== 'loading' && (
-                    <div className="mt-2 pt-2 border-t border-gray-700 flex items-center gap-4">
-                        <button 
-                            onClick={() => onCopy(msg.content)} 
-                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors"
-                        >
-                            <FaCopy /> {isCopied ? 'تم النسخ!' : 'نسخ'}
-                        </button>
-                        <button 
-                            onClick={() => handleFeedbackClick('positive')} 
-                            className={`flex items-center gap-1 text-xs transition-colors ${
-                                feedbackStatus === 'positive' 
-                                ? 'text-green-400' 
-                                : 'text-gray-400 hover:text-white'
-                            }`}
-                            disabled={!!feedbackStatus}
-                        >
-                            <FaThumbsUp /> مفيد
-                        </button>
-                        <button 
-                            onClick={() => handleFeedbackClick('negative')} 
-                             className={`flex items-center gap-1 text-xs transition-colors ${
-                                feedbackStatus === 'negative' 
-                                ? 'text-red-400' 
-                                : 'text-gray-400 hover:text-white'
-                            }`}
-                            disabled={!!feedbackStatus}
-                        >
-                            <FaThumbsDown /> غير مفيد
-                        </button>
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] flex items-center justify-center shadow-lg shadow-[var(--color-primary)]/30">
+                        <FaRobot className="text-white" />
                     </div>
                 )}
             </div>
+            
+            {/* Message Bubble */}
+            <div className={`
+                group relative max-w-[80%] rounded-2xl
+                ${isUser 
+                    ? 'bg-[var(--color-primary)] text-white rounded-tr-none' 
+                    : 'bg-[var(--color-surface-1)] border border-[var(--color-border-default)] text-[var(--color-text-primary)] rounded-tl-none'
+                }
+            `}>
+                <div className="p-4">
+                    {isLoading ? (
+                        <TypingIndicator />
+                    ) : (
+                        <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    )}
+                </div>
+                
+                {/* Actions for AI messages */}
+                {!isUser && !isLoading && (
+                    <div className="px-4 pb-3 pt-2 border-t border-[var(--color-border-default)] flex items-center gap-3">
+                        <button 
+                            onClick={() => onCopy(msg.content)} 
+                            className={`
+                                flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-lg transition-all
+                                ${isCopied 
+                                    ? 'bg-emerald-500/20 text-emerald-400' 
+                                    : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)]'
+                                }
+                            `}
+                        >
+                            {isCopied ? <FaCheckCircle className="w-3 h-3" /> : <FaCopy className="w-3 h-3" />}
+                            {isCopied ? 'تم' : 'نسخ'}
+                        </button>
+                        
+                        <div className="flex items-center gap-1">
+                            <button 
+                                onClick={() => !feedbackStatus && onFeedback(msg.id, 'positive')} 
+                                disabled={!!feedbackStatus}
+                                className={`
+                                    p-1.5 rounded-lg transition-all
+                                    ${feedbackStatus === 'positive' 
+                                        ? 'bg-emerald-500/20 text-emerald-400' 
+                                        : feedbackStatus 
+                                            ? 'opacity-50 cursor-not-allowed text-[var(--color-text-muted)]'
+                                            : 'text-[var(--color-text-muted)] hover:bg-emerald-500/10 hover:text-emerald-400'
+                                    }
+                                `}
+                            >
+                                <FaThumbsUp className="w-3 h-3" />
+                            </button>
+                            <button 
+                                onClick={() => !feedbackStatus && onFeedback(msg.id, 'negative')} 
+                                disabled={!!feedbackStatus}
+                                className={`
+                                    p-1.5 rounded-lg transition-all
+                                    ${feedbackStatus === 'negative' 
+                                        ? 'bg-red-500/20 text-red-400' 
+                                        : feedbackStatus 
+                                            ? 'opacity-50 cursor-not-allowed text-[var(--color-text-muted)]'
+                                            : 'text-[var(--color-text-muted)] hover:bg-red-500/10 hover:text-red-400'
+                                    }
+                                `}
+                            >
+                                <FaThumbsDown className="w-3 h-3" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </motion.div>
+    );
+};
+
+const SuggestedQuestions = ({ onSelect }) => {
+    const suggestions = [
+        "ما هي أفضل المسارات المهنية للمبتدئين؟",
+        "كيف أعرف أي مجال يناسبني؟",
+        "ما المهارات المطلوبة للبرمجة؟",
+        "أخبرني عن مهنة التسويق الرقمي"
+    ];
+    
+    return (
+        <div className="grid grid-cols-2 gap-2 mt-4">
+            {suggestions.map((q, i) => (
+                <motion.button
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    onClick={() => onSelect(q)}
+                    className="p-3 text-right text-sm rounded-xl bg-[var(--color-surface-1)] border border-[var(--color-border-default)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:border-[var(--color-primary)]/50 hover:text-[var(--color-text-primary)] transition-all"
+                >
+                    {q}
+                </motion.button>
+            ))}
         </div>
     );
 };
@@ -91,9 +177,7 @@ export default function ChatInterface() {
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: true });
 
-            if (error) {
-                // console.error('Error fetching messages:', error);
-            } else {
+            if (!error) {
                 setMessages(data);
             }
         };
@@ -103,7 +187,7 @@ export default function ChatInterface() {
     useEffect(scrollToBottom, [messages]);
 
     const handleSendMessage = async (e) => {
-        e.preventDefault();
+        e?.preventDefault();
         if (input.trim() === '' || isLoading) return;
 
         const userMessageContent = input;
@@ -127,19 +211,13 @@ export default function ChatInterface() {
         setIsLoading(true);
         setInput('');
 
-        // Save user message to DB
-        const { error: userError } = await supabase.from('chat_messages').insert(userMessage);
-        if (userError) {
-            // console.error("Error saving user message:", userError)
-        };
-
+        await supabase.from('chat_messages').insert(userMessage);
 
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) throw new Error("User not authenticated");
 
-            // Use fetch to handle the stream from the Edge Function
-            const response = await fetch(`${supabase.functionsUrl}/chat-with-ayed`, {
+            const response = await fetch(`${supabase.functionsUrl}/chat-with-sanad`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -168,22 +246,16 @@ export default function ChatInterface() {
                 if (done) break;
 
                 buffer += value;
-                
                 const lines = buffer.split('\n');
-                buffer = lines.pop() || ''; // Keep the last, possibly incomplete line in buffer
+                buffer = lines.pop() || '';
 
                 for (const line of lines) {
                     if (line.startsWith('data:')) {
                         const data = line.substring(5).trim();
-                        // console.log('Stream data received:', data); // Log the raw data from the stream
-
-                        if (data === '[DONE]') {
-                            break;
-                        }
+                        if (data === '[DONE]') break;
 
                         try {
                             const json = JSON.parse(data);
-                            
                             if (json.type === 'content-delta' && json.delta?.message?.content?.text) {
                                 accumulatedResponse += json.delta.message.content.text;
                                 setMessages(prev => prev.map(msg =>
@@ -193,16 +265,13 @@ export default function ChatInterface() {
                                 ));
                             }
                         } catch {
-                            // console.warn("Failed to parse a chunk of the stream:", data, e);
+                            // Ignore parse errors
                         }
                     }
                 }
-                 if (lines.some(line => line.includes('[DONE]'))) {
-                    break;
-                }
+                if (lines.some(line => line.includes('[DONE]'))) break;
             }
             
-            // Once streaming is complete, save the final message to the database
             const aiMessageToSave = {
                 content: accumulatedResponse,
                 sender: 'assistant',
@@ -215,22 +284,18 @@ export default function ChatInterface() {
                 .select()
                 .single();
 
-            if (aiError) {
-                // console.error("Error saving AI message:", aiError);
-            } else {
-                 setMessages(prev => prev.map(msg => msg.id === tempAiMessageId ? savedAiMessage : msg));
+            if (!aiError) {
+                setMessages(prev => prev.map(msg => msg.id === tempAiMessageId ? savedAiMessage : msg));
             }
 
-
         } catch {
-             const errorMessage = { 
-                 id: tempAiMessageId,
-                 content: 'عذرًا، حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة مرة أخرى.', 
-                 sender: 'assistant', 
-                 user_id: user.id 
+            const errorMessage = { 
+                id: tempAiMessageId,
+                content: 'عذرًا، حدث خطأ أثناء الاتصال. يرجى المحاولة مرة أخرى.', 
+                sender: 'assistant', 
+                user_id: user.id 
             };
-             setMessages(prev => prev.map(msg => msg.id === tempAiMessageId ? errorMessage : msg));
-            // console.error('Error invoking Supabase function:', error);
+            setMessages(prev => prev.map(msg => msg.id === tempAiMessageId ? errorMessage : msg));
         } finally {
             setIsLoading(false);
         }
@@ -245,9 +310,7 @@ export default function ChatInterface() {
             .delete()
             .eq('user_id', user.id);
 
-        if (error) {
-            // console.error('Error clearing chat:', error);
-        } else {
+        if (!error) {
             setMessages([]);
         }
     };
@@ -269,8 +332,6 @@ export default function ChatInterface() {
             .insert({ message_id: messageId, user_id: user.id, rating });
         
         if (error) {
-            // console.error('Error submitting feedback:', error);
-            // Optional: Revert feedback state on error
             setFeedbackSent(prev => {
                 const newState = {...prev};
                 delete newState[messageId];
@@ -279,60 +340,114 @@ export default function ChatInterface() {
         }
     };
 
+    const handleSuggestionSelect = (question) => {
+        setInput(question);
+    };
 
     return (
-        <div className="bg-gray-900/50 rounded-2xl h-full flex flex-col p-4">
-            <div className="flex justify-between items-center mb-2">
-                <h2 className="text-xl font-bold">Ayed Chat</h2>
-                 <button 
-                    onClick={() => setConfirmOpen(true)}
-                    className="p-2 hover:bg-gray-700 rounded-full"
-                    title="Clear Conversation"
-                >
-                    <FaTrash />
-                </button>
-            </div>
-            <div className="flex-grow overflow-y-auto pr-2">
-                {messages.length === 0 && (
-                    <div className="text-center text-gray-400 mt-8">
-                        أهلاً بك! أنا عايد، مساعدك الشخصي. ابدأ محادثتك.
+        <div className="h-full flex flex-col bg-[var(--color-bg-primary)]">
+            {/* Header */}
+            <div className="shrink-0 p-4 border-b border-[var(--color-border-default)] bg-[var(--color-surface-1)]">
+                <div className="flex items-center justify-between">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setConfirmOpen(true)}
+                        icon={<FaTrash className="w-4 h-4" />}
+                        className="text-[var(--color-text-muted)] hover:text-red-400"
+                    >
+                        مسح المحادثة
+                    </Button>
+                    
+                    <div className="flex items-center gap-3">
+                        <div className="text-right">
+                            <h2 className="text-lg font-bold text-[var(--color-text-primary)]">سَند</h2>
+                            <p className="text-xs text-[var(--color-text-muted)]">مساعدك الذكي</p>
+                        </div>
+                        <div className="relative">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] flex items-center justify-center shadow-lg shadow-[var(--color-primary)]/30">
+                                <FaRobot className="text-white text-xl" />
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[var(--color-surface-1)]" />
+                        </div>
                     </div>
-                )}
-                {messages.map((msg) => (
-                    <ChatMessage 
-                        key={msg.id} 
-                        msg={msg} 
-                        onFeedback={handleFeedback}
-                        onCopy={handleCopy}
-                        isCopied={copiedMessageId === msg.id}
-                        feedbackStatus={feedbackSent[msg.id]}
-                    />
-                ))}
+                </div>
+            </div>
+            
+            {/* Messages Area */}
+            <div className="flex-grow overflow-y-auto p-4 custom-scrollbar">
+                <AnimatePresence>
+                    {messages.length === 0 ? (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="h-full flex flex-col items-center justify-center text-center"
+                        >
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] flex items-center justify-center mb-6 shadow-xl shadow-[var(--color-primary)]/30">
+                                <FaRobot className="text-white text-3xl" />
+                            </div>
+                            <h3 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">مرحباً! أنا سَند 👋</h3>
+                            <p className="text-[var(--color-text-secondary)] max-w-md mb-6">
+                                مساعدك الذكي في منصة جلينت. اسألني أي سؤال عن المهن والمسارات وأنا هنا لدعمك!
+                            </p>
+                            <SuggestedQuestions onSelect={handleSuggestionSelect} />
+                        </motion.div>
+                    ) : (
+                        <div className="space-y-2">
+                            {messages.map((msg) => (
+                                <ChatMessage 
+                                    key={msg.id} 
+                                    msg={msg} 
+                                    onFeedback={handleFeedback}
+                                    onCopy={handleCopy}
+                                    isCopied={copiedMessageId === msg.id}
+                                    feedbackStatus={feedbackSent[msg.id]}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </AnimatePresence>
                 <div ref={messagesEndRef} />
             </div>
-            <form onSubmit={handleSendMessage} className="mt-4 flex items-center gap-3">
-                <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="اكتب رسالتك هنا..."
-                    className="flex-grow bg-gray-800 border-2 border-gray-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500 transition-colors"
-                />
-                <button
-                    type="submit"
-                    className="bg-blue-600 text-white rounded-lg p-3 hover:bg-blue-500 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
-                    disabled={!input.trim() || isLoading}
-                >
-                    <FaPaperPlane className="text-xl" />
-                </button>
-            </form>
+            
+            {/* Input Area */}
+            <div className="shrink-0 p-4 border-t border-[var(--color-border-default)] bg-[var(--color-surface-1)]">
+                <form onSubmit={handleSendMessage} className="flex items-center gap-3">
+                    <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="اكتب رسالتك هنا..."
+                        className="
+                            flex-grow bg-[var(--color-bg-primary)]
+                            border-2 border-[var(--color-border-default)]
+                            rounded-xl py-3 px-4
+                            text-[var(--color-text-primary)]
+                            placeholder:text-[var(--color-text-muted)]
+                            focus:outline-none focus:border-[var(--color-primary)]
+                            transition-colors
+                        "
+                        dir="rtl"
+                    />
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        isDisabled={!input.trim() || isLoading}
+                        isLoading={isLoading}
+                        icon={<FaPaperPlane />}
+                        isIconOnly
+                        className="shrink-0"
+                    />
+                </form>
+            </div>
+            
             <ConfirmModal 
                 isOpen={isConfirmOpen}
                 onClose={() => setConfirmOpen(false)}
                 onConfirm={handleClearChat}
-                title="Clear Conversation"
-                message="Are you sure you want to delete this entire conversation? This action cannot be undone."
+                title="مسح المحادثة"
+                message="هل أنت متأكد من حذف المحادثة بالكامل؟ هذا الإجراء لا يمكن التراجع عنه."
             />
         </div>
     );
-} 
+}

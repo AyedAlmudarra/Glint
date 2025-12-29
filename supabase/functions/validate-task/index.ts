@@ -26,6 +26,12 @@ type Solution = {
     validation_type: 'checklist_and_keyword_match';
     checklist_solution: string[];
     keyword_solution: string[];
+} | {
+    validation_type: 'range_match';
+    target_conversion_score_min: number;
+    target_conversion_score_max: number;
+} | {
+    validation_type: 'completion';
 };
 
 // Utility to handle circular references in JSON
@@ -70,6 +76,15 @@ serve(async (req) => {
     const { taskId, answer }: RequestBody = await req.json();
     if (!taskId || answer === undefined) {
       throw new Error("Task ID and user answer are required.");
+    }
+    
+    // Get the authenticated user
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) {
+      return new Response(JSON.stringify({ error: 'User not authenticated' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401,
+      });
     }
 
     // 4. Fetch the task's definition from the database
@@ -210,14 +225,52 @@ serve(async (req) => {
         break;
       }
 
+      case 'range_match': {
+        const payload = answer as { conversionScore: number };
+        const { conversionScore } = payload;
+        const { target_conversion_score_min, target_conversion_score_max } = solution;
+        
+        isCorrect = conversionScore >= target_conversion_score_min && conversionScore <= target_conversion_score_max;
+        
+        if (isCorrect) {
+          message = 'ممتاز! توزيع الميزانية يحقق توازناً مثالياً بين الوعي والتحويل.';
+        } else if (conversionScore < target_conversion_score_min) {
+          message = 'التوزيع يركز كثيراً على الوعي. حاول تخصيص المزيد للتحويل.';
+        } else {
+          message = 'التوزيع يركز كثيراً على التحويل. حاول تخصيص المزيد للوعي.';
+        }
+        break;
+      }
+
+      case 'completion': {
+        // For completion-based tasks, any submission is considered correct
+        isCorrect = true;
+        message = 'تم إكمال المهمة بنجاح! أحسنت في إنجاز هذا التحدي الإبداعي.';
+        break;
+      }
+
       default:
         console.warn(`Unknown validation type`);
         break;
     }
 
-    // 6. Return the result
-    if (isCorrect && !message.includes('أحسنت')) {
-        message = 'إجابة صحيحة! أحسنت.';
+    // If the answer is correct, record the completion in the database
+    if (isCorrect) {
+        const { error: insertError } = await supabaseClient
+            .from('user_task_progress')
+            .insert({ user_id: user.id, task_id: taskId });
+
+        // If the record already exists, it's not an error.
+        // The user might be re-submitting a correct answer.
+        // PostgreSQL unique violation error code is '23505'.
+        if (insertError && insertError.code !== '23505') {
+            console.error('Failed to insert task progress:', insertError);
+            throw new Error(`Failed to save task progress: ${insertError.message}`);
+        }
+        
+        if (!message.includes('أحسنت')) {
+            message = 'إجابة صحيحة! أحسنت.';
+        }
     }
 
     const responseData = {

@@ -22,7 +22,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-console.log("Hello from Functions!")
+console.log("Hello from Sanad AI Assistant!")
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -32,16 +32,17 @@ serve(async (req) => {
   try {
     const { message, context, userProfile, tasks, progress } = await req.json();
 
-    const systemPrompt = `You are 'Ayed' (عايد), a highly knowledgeable and encouraging AI career counselor for students on the 'Glint' (جلينت) platform. Your knowledge is an authoritative reflection of the platform's content.
+    const systemPrompt = `You are 'Sanad' (سَند), a highly knowledgeable and encouraging AI career counselor for students on the 'Glint' (جلينت) platform. Your knowledge is an authoritative reflection of the platform's content.
 
 **Your Persona:**
 - You are friendly, professional, and supportive.
 - Your goal is to help students explore career paths, understand their skills, and find relevant simulations on the Glint platform.
 - You are an expert in the Saudi job market and educational pathways.
 - **You MUST communicate exclusively in Arabic.** Do not use any other language.
+- Your name "سَند" means "support" in Arabic - you are here to support and guide students in their career exploration journey.
 
 **Core Directives:**
-- **Maintain Persona:** Never reveal that you are an AI or language model. You are Ayed. All your knowledge comes from the Glint platform itself.
+- **Maintain Persona:** Never reveal that you are an AI or language model. You are Sanad (سَند). All your knowledge comes from the Glint platform itself.
 - **Speak with Authority:** Do not use hedging language like "Here are a few examples..." or "The platform may have...". Speak as if you have complete and total knowledge of all simulations and career paths available on Glint.
 - **Use Your Tools:** To answer any questions about the platform's content (such as available simulations or tasks), you MUST use the tools provided to you. Do not invent answers or rely on general knowledge for this information. Always fetch the real, up-to-date data before answering.
 
@@ -227,9 +228,10 @@ Based on all the provided context (student info, progress, and conversation hist
   1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
   2. Make an HTTP request:
 
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/chat-with-ayed' \
+  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/chat-with-sanad' \
     --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
     --header 'Content-Type: application/json' \
     --data '{"name":"Functions"}'
 
 */
+

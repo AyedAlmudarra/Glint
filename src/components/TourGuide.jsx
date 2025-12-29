@@ -73,16 +73,16 @@ export default function TourGuide() {
             ></div>
             <div
                 ref={dialogRef}
-                className="absolute p-6 bg-gray-800 text-white rounded-lg shadow-xl z-50 max-w-sm transition-all duration-300 ease-in-out"
+                className="absolute p-6 bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] text-[var(--color-text-primary)] rounded-lg shadow-xl z-50 max-w-sm transition-all duration-300 ease-in-out"
                 style={styles.dialog}
             >
                 <h3 className="text-xl font-bold mb-2">{currentStep.title}</h3>
-                <p className="text-gray-300 mb-6">{currentStep.content}</p>
+                <p className="text-[var(--color-text-secondary)] mb-6">{currentStep.content}</p>
                 <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">{stepIndex + 1} / {steps.length}</span>
+                    <span className="text-[var(--color-text-muted)] text-sm">{stepIndex + 1} / {steps.length}</span>
                     <div>
-                        <button onClick={stopTour} className="text-gray-400 hover:text-white transition-colors mr-4">تخطي</button>
-                        <button onClick={nextStep} className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-md transition-colors">
+                        <button onClick={stopTour} className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors mr-4">تخطي</button>
+                        <button onClick={nextStep} className="bg-[var(--color-accent-primary)] hover:opacity-90 px-6 py-2 rounded-md transition-all">
                             {isLastStep ? 'إنهاء' : 'التالي'}
                         </button>
                     </div>

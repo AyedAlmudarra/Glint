@@ -1,123 +1,288 @@
 import { useState, forwardRef } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { FaSignOutAlt, FaBars, FaTimes, FaCheckCircle, FaChevronDown } from 'react-icons/fa';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaSignOutAlt, FaBars, FaTimes, FaCheckCircle, FaChevronDown, FaChevronLeft } from 'react-icons/fa';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { navLinks } from '../config/navigation.jsx';
-import NavLink from './navigation/NavLink';
+import Badge from './ui/Badge';
+import Tooltip from './ui/Tooltip';
+
+const NavLinkItem = ({ link, isExpanded, isActive }) => {
+  const content = (
+    <Link
+      to={link.path}
+      className={`
+        w-full flex items-center gap-3 p-3 rounded-xl
+        transition-all duration-200
+        ${isActive 
+          ? 'bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/30' 
+          : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)]'
+        }
+        ${!isExpanded ? 'justify-center' : ''}
+      `}
+    >
+      <span className={`text-xl ${isActive ? 'text-white' : ''}`}>
+        {link.icon}
+      </span>
+      {isExpanded && (
+        <span className="font-medium whitespace-nowrap">{link.name}</span>
+      )}
+    </Link>
+  );
+
+  if (!isExpanded) {
+    return (
+      <Tooltip content={link.name} position="left">
+        {content}
+      </Tooltip>
+    );
+  }
+
+  return content;
+};
+
+const TaskItem = ({ task, simulationId, currentTaskId, isCompleted, isExpanded }) => {
+  const isActive = currentTaskId === task.id;
+  
+  return (
+    <motion.li
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Link
+        to={`/simulations/task/${simulationId}?task=${task.id}`}
+        className={`
+          w-full flex items-center gap-3 p-3 rounded-lg
+          transition-all duration-200 text-right
+          ${isActive 
+            ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] border border-[var(--color-primary)]/30' 
+            : 'hover:bg-[var(--color-surface-2)] text-[var(--color-text-secondary)]'
+          }
+        `}
+      >
+        {/* Status indicator */}
+        <div className={`
+          w-6 h-6 rounded-full flex items-center justify-center shrink-0
+          ${isCompleted 
+            ? 'bg-emerald-500/20 text-emerald-400' 
+            : isActive 
+              ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)]'
+              : 'bg-[var(--color-surface-2)] text-[var(--color-text-muted)]'
+          }
+        `}>
+          {isCompleted ? (
+            <FaCheckCircle className="w-3 h-3" />
+          ) : (
+            <span className="text-xs font-medium">{task.order_index + 1}</span>
+          )}
+        </div>
+        
+        {isExpanded && (
+          <span className="flex-1 text-sm font-medium truncate">{task.title}</span>
+        )}
+      </Link>
+    </motion.li>
+  );
+};
 
 const Sidebar = forwardRef(({ simulationTitle, tasks, currentTaskId, userProgress, isMobileOpen, onClose }, ref) => {
-    const [isExpanded, setIsExpanded] = useState(true);
-    const [isTasksExpanded, setIsTasksExpanded] = useState(true);
-    const navigate = useNavigate();
-    const { user } = useAuth();
-    const { simulationId } = useParams();
-    
-    // Default to 'student' role if not specified in user metadata
-    const userRole = user?.user_metadata?.role || 'student';
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [isTasksExpanded, setIsTasksExpanded] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+  const { simulationId } = useParams();
+  
+  const userRole = user?.user_metadata?.role || 'student';
 
-    const accessibleLinks = navLinks.filter(link => 
-        !link.roles || link.roles.includes(userRole)
-    );
+  const accessibleLinks = navLinks.filter(link => 
+    !link.roles || link.roles.includes(userRole)
+  );
 
-    const handleLogout = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (!error) {
-            navigate('/login');
-        } else {
-            console.error('Error logging out:', error);
-        }
-    };
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      navigate('/login');
+    } else {
+      console.error('Error logging out:', error);
+    }
+  };
 
-    return (
-        <>
-            {/* Backdrop for mobile */}
-            {isMobileOpen && <div onClick={onClose} className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"></div>}
+  const completedCount = userProgress?.length || 0;
+  const totalCount = tasks?.length || 0;
 
-            <aside 
-                id="main-sidebar"
-                ref={ref}
-                data-tour-id="sidebar" 
-                className={`bg-gray-800 text-white h-screen p-4 flex flex-col transition-all duration-300
-                    fixed inset-y-0 right-0 z-40 transform md:sticky md:top-0 md:translate-x-0 
-                    ${isMobileOpen ? 'translate-x-0' : 'translate-x-full'} 
-                    ${isExpanded ? 'w-72' : 'w-20'}`}
-            >
-                <div className={`flex items-center mb-10 ${isExpanded ? 'justify-between' : 'justify-center'}`}>
-                    <Link to="/" className={`font-bold text-2xl transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'hidden'}`}>
-                        جلينت
-                    </Link>
-                    <button 
-                        data-tour-id="sidebar-toggle" 
-                        onClick={() => setIsExpanded(!isExpanded)} 
-                        className="text-white hover:text-blue-400 hidden md:block"
-                        aria-label={isExpanded ? 'Collapse navigation' : 'Expand navigation'}
-                    >
-                        {isExpanded ? <FaTimes /> : <FaBars />}
-                    </button>
-                    <button 
-                        onClick={onClose} 
-                        className="text-white hover:text-blue-400 md:hidden"
-                        aria-label="Close navigation"
-                    >
-                        <FaTimes />
-                    </button>
-                </div>
+  return (
+    <>
+      {/* Backdrop for mobile */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
+          />
+        )}
+      </AnimatePresence>
 
-                <nav className="flex-grow overflow-y-auto">
-                    {accessibleLinks.map((link) => (
-                        <NavLink key={link.path} link={link} isExpanded={isExpanded} />
+      <aside 
+        id="main-sidebar"
+        ref={ref}
+        data-tour-id="sidebar" 
+        className={`
+          bg-[var(--color-surface-1)] border-l border-[var(--color-border-default)]
+          text-[var(--color-text-primary)] h-screen flex flex-col
+          transition-all duration-300 ease-in-out
+          fixed inset-y-0 right-0 z-40 
+          md:sticky md:top-0 md:translate-x-0 
+          ${isMobileOpen ? 'translate-x-0' : 'translate-x-full'} 
+          ${isExpanded ? 'w-72' : 'w-20'}
+        `}
+      >
+        {/* Header */}
+        <div className={`
+          p-4 border-b border-[var(--color-border-default)]
+          flex items-center ${isExpanded ? 'justify-between' : 'justify-center'}
+        `}>
+          {isExpanded ? (
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/GlintFullLogoWhite.png" 
+                alt="Glint" 
+                className="h-7 w-auto"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            </Link>
+          ) : (
+            <Link to="/" className="flex items-center justify-center">
+              <img 
+                src="/GlintLogo.svg" 
+                alt="Glint" 
+                className="h-8 w-8"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            </Link>
+          )}
+          
+          {/* Toggle button - Desktop */}
+          <button 
+            data-tour-id="sidebar-toggle" 
+            onClick={() => setIsExpanded(!isExpanded)} 
+            className="hidden md:flex w-8 h-8 items-center justify-center rounded-lg bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)] transition-colors"
+            aria-label={isExpanded ? 'طي القائمة' : 'توسيع القائمة'}
+          >
+            <FaChevronLeft className={`w-4 h-4 transition-transform duration-300 ${!isExpanded ? 'rotate-180' : ''}`} />
+          </button>
+          
+          {/* Close button - Mobile */}
+          <button 
+            onClick={onClose} 
+            className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+            aria-label="إغلاق القائمة"
+          >
+            <FaTimes className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-grow overflow-y-auto p-4 space-y-2 custom-scrollbar">
+          {accessibleLinks.map((link) => (
+            <NavLinkItem
+              key={link.path}
+              link={link}
+              isExpanded={isExpanded}
+              isActive={location.pathname === link.path}
+            />
+          ))}
+          
+          {/* Simulation Tasks */}
+          {tasks && tasks.length > 0 && (
+            <div className="mt-6 pt-6 border-t border-[var(--color-border-default)]">
+              <button 
+                className={`
+                  w-full flex items-center gap-2 px-3 py-2 rounded-lg
+                  text-sm font-semibold text-[var(--color-text-secondary)]
+                  hover:bg-[var(--color-surface-2)] transition-colors
+                  ${!isExpanded ? 'justify-center' : 'justify-between'}
+                `}
+                onClick={() => setIsTasksExpanded(!isTasksExpanded)}
+                aria-expanded={isTasksExpanded}
+              >
+                {isExpanded && (
+                  <>
+                    <span className="truncate">{simulationTitle}</span>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="primary" size="sm">
+                        {completedCount}/{totalCount}
+                      </Badge>
+                      <FaChevronDown className={`w-3 h-3 transition-transform duration-200 ${isTasksExpanded ? 'rotate-180' : ''}`} />
+                    </div>
+                  </>
+                )}
+                {!isExpanded && (
+                  <Tooltip content={simulationTitle} position="left">
+                    <Badge variant="primary" size="sm">{completedCount}</Badge>
+                  </Tooltip>
+                )}
+              </button>
+              
+              <AnimatePresence>
+                {isTasksExpanded && isExpanded && (
+                  <motion.ul
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="mt-2 space-y-1 overflow-hidden"
+                  >
+                    {tasks.map((task) => (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        simulationId={simulationId}
+                        currentTaskId={currentTaskId}
+                        isCompleted={userProgress?.includes(task.id)}
+                        isExpanded={isExpanded}
+                      />
                     ))}
-                    
-                    {tasks && tasks.length > 0 && (
-                        <div className="mt-6 pt-6 border-t border-gray-700">
-                             <button 
-                                className="w-full flex items-center justify-between px-3 text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2"
-                                onClick={() => setIsTasksExpanded(!isTasksExpanded)}
-                                aria-expanded={isTasksExpanded}
-                                aria-controls="simulation-tasks-list"
-                            >
-                                <span>{simulationTitle}</span>
-                                <FaChevronDown className={`transition-transform duration-300 ${isTasksExpanded ? 'rotate-180' : ''}`} />
-                            </button>
-                            <div 
-                                className={`transition-all duration-300 ease-in-out overflow-hidden ${isTasksExpanded ? 'max-h-96' : 'max-h-0'}`}
-                            >
-                                <ul id="simulation-tasks-list" className="space-y-2 mt-2">
-                                    {tasks.map((task) => (
-                                        <li key={task.id}>
-                                            <Link
-                                                to={`/simulations/task/${simulationId}?task=${task.id}`}
-                                                className={`w-full text-right flex items-center justify-between p-3 rounded-lg transition-colors duration-200 ${
-                                                    currentTaskId === task.id ? 'bg-blue-600 text-white' : 'hover:bg-gray-700 text-gray-300'
-                                                }`}
-                                            >
-                                                <span className="font-semibold">{task.title}</span>
-                                                {userProgress?.includes(task.id) && <FaCheckCircle className="text-green-400" />}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    )}
-                </nav>
+                  </motion.ul>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+        </nav>
 
-                <div className="mt-auto">
-                    <button 
-                        onClick={handleLogout}
-                        data-tour-id="sidebar-logout"
-                        className={`w-full flex items-center p-3 my-2 text-gray-400 hover:bg-gray-700 hover:text-white rounded-lg transition-colors duration-200 ${!isExpanded && 'justify-center'}`}
-                    >
-                        <FaSignOutAlt className="text-xl" />
-                        <span className={`whitespace-nowrap mr-4 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'hidden'}`}>
-                            تسجيل الخروج
-                        </span>
-                    </button>
-                </div>
-            </aside>
-        </>
-    );
+        {/* Footer */}
+        <div className="p-4 border-t border-[var(--color-border-default)]">
+          <button 
+            onClick={handleLogout}
+            data-tour-id="sidebar-logout"
+            className={`
+              w-full flex items-center gap-3 p-3 rounded-xl
+              text-[var(--color-text-secondary)] 
+              hover:bg-red-500/10 hover:text-red-400
+              transition-all duration-200
+              ${!isExpanded ? 'justify-center' : ''}
+            `}
+          >
+            <FaSignOutAlt className="text-xl" />
+            {isExpanded && (
+              <span className="font-medium whitespace-nowrap">تسجيل الخروج</span>
+            )}
+          </button>
+        </div>
+      </aside>
+    </>
+  );
 });
 
-export default Sidebar; 
+Sidebar.displayName = 'Sidebar';
+
+export default Sidebar;

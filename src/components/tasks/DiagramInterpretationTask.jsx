@@ -89,26 +89,26 @@ const DiagramInterpretationTask = ({ definition, onComplete, feedback, setFeedba
     };
 
     return (
-        <div className="bg-gray-800 rounded-2xl p-6 h-full flex flex-col text-right gap-4 relative">
+        <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-2xl p-6 h-full flex flex-col text-right gap-4 relative">
             {showConfetti && <Confetti recycle={false} />}
             
             <div className="text-center mb-4">
-                <h3 className="text-xl font-bold text-white mb-2">السيناريو</h3>
-                <p className="text-gray-300">{scenario}</p>
+                <h3 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">السيناريو</h3>
+                <p className="text-[var(--color-text-secondary)]">{scenario}</p>
             </div>
 
             {diagram && (
-                <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-700 mb-4">
+                <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg border border-[var(--color-border-primary)] mb-4">
                     <Flowchart diagram={diagram} />
                 </div>
             )}
             
-            <div className="bg-gray-900/50 p-4 rounded-lg">
-                <h3 className="font-bold text-blue-300 mb-3">خطوات الحل</h3>
-                <ul className="space-y-2 text-gray-400">
+            <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg border border-[var(--color-border-primary)]">
+                <h3 className="font-bold text-[var(--color-accent-primary)] mb-3">خطوات الحل</h3>
+                <ul className="space-y-2 text-[var(--color-text-secondary)]">
                     {steps.map((step, index) => (
                         <li key={index} className="flex items-start gap-2">
-                            <span className="bg-blue-600 text-white rounded-full w-5 h-5 flex-shrink-0 flex items-center justify-center text-xs mt-1">{index + 1}</span>
+                            <span className="bg-[var(--color-accent-primary)] text-white rounded-full w-5 h-5 flex-shrink-0 flex items-center justify-center text-xs mt-1">{index + 1}</span>
                             <span>{step}</span>
                         </li>
                     ))}
@@ -116,13 +116,13 @@ const DiagramInterpretationTask = ({ definition, onComplete, feedback, setFeedba
             </div>
 
             <div className="mt-4 flex-grow flex flex-col justify-end">
-                <label htmlFor="answer-input" className="block mb-2 font-bold text-lg text-white">{question}</label>
+                <label htmlFor="answer-input" className="block mb-2 font-bold text-lg text-[var(--color-text-primary)]">{question}</label>
                 <input
                     id="answer-input"
                     type="text"
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
-                    className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border-primary)] rounded-lg p-3 text-right text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-primary)]"
                     placeholder="اكتب إجابتك هنا..."
                     disabled={isSubmitting || (feedback && feedback.is_correct)}
                 />
@@ -138,7 +138,7 @@ const DiagramInterpretationTask = ({ definition, onComplete, feedback, setFeedba
             <div className="mt-4 flex justify-between items-center">
                 <button
                     onClick={resetTask}
-                    className="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-500 transition-colors text-sm flex items-center gap-2"
+                    className="bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] font-bold py-2 px-4 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-all text-sm flex items-center gap-2 border border-[var(--color-border-primary)]"
                 >
                     <FaSync />
                     <span>إعادة المحاولة</span>
@@ -146,7 +146,7 @@ const DiagramInterpretationTask = ({ definition, onComplete, feedback, setFeedba
                 <button
                     onClick={handleSubmit}
                     disabled={isSubmitting || !answer || (feedback && feedback.is_correct)}
-                    className="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-500 transition-colors duration-300 flex items-center gap-2 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                    className="bg-[var(--color-success)] text-white font-bold py-2 px-6 rounded-lg hover:opacity-90 transition-all duration-300 flex items-center gap-2 disabled:bg-[var(--color-text-muted)] disabled:cursor-not-allowed"
                 >
                     {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaPaperPlane />}
                     <span>

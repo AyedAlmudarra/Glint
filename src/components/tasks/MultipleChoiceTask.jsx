@@ -19,14 +19,14 @@ const MultipleChoiceTask = ({ definition, onComplete, feedback, isSubmitting }) 
     const isCorrectSelection = feedback?.is_correct && selectedOption === definition.solution.expected_value;
 
     return (
-        <div className="bg-gray-800 rounded-2xl p-8 h-full flex flex-col text-right gap-6">
+        <div className="bg-[var(--color-bg-secondary)] rounded-2xl p-8 h-full flex flex-col text-right gap-6 border border-[var(--color-border-primary)]">
             <div>
-                <h3 className="text-xl font-bold text-blue-300 mb-2">السيناريو</h3>
-                <p className="text-gray-300">{scenario}</p>
+                <h3 className="text-xl font-bold text-[var(--color-accent-primary)] mb-2">السيناريو</h3>
+                <p className="text-[var(--color-text-secondary)]">{scenario}</p>
             </div>
             <div>
-                <h3 className="text-xl font-bold text-blue-300 mb-2">المطلوب</h3>
-                <p className="text-gray-300">{question}</p>
+                <h3 className="text-xl font-bold text-[var(--color-accent-primary)] mb-2">المطلوب</h3>
+                <p className="text-[var(--color-text-secondary)]">{question}</p>
             </div>
             
             <div className="flex-grow space-y-4">
@@ -37,8 +37,8 @@ const MultipleChoiceTask = ({ definition, onComplete, feedback, isSubmitting }) 
                         disabled={isSubmitting || (feedback && feedback.is_correct)}
                         className={`w-full text-right p-4 rounded-lg transition-all duration-200 border-2 ${
                             selectedOption === option
-                                ? 'bg-blue-600 border-blue-400 text-white'
-                                : 'bg-gray-700/50 border-gray-600 hover:bg-gray-700 hover:border-gray-500'
+                                ? 'bg-[var(--color-accent-primary)] border-[var(--color-accent-primary)] text-white'
+                                : 'bg-[var(--color-bg-tertiary)] border-[var(--color-border-primary)] hover:bg-[var(--color-bg-secondary)] hover:border-[var(--color-border-secondary)]'
                         } disabled:cursor-not-allowed disabled:opacity-70`}
                     >
                         {option}
@@ -57,7 +57,7 @@ const MultipleChoiceTask = ({ definition, onComplete, feedback, isSubmitting }) 
                 <button
                     onClick={handleSubmit}
                     disabled={selectedOption === null || isSubmitting || (feedback && feedback.is_correct)}
-                    className="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-500 transition-colors duration-300 flex items-center gap-2 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                    className="bg-[var(--color-success)] text-white font-bold py-2 px-6 rounded-lg hover:opacity-90 transition-all duration-300 flex items-center gap-2 disabled:bg-[var(--color-text-muted)] disabled:cursor-not-allowed"
                 >
                     {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaPaperPlane />}
                     <span>

@@ -15,23 +15,23 @@ const ResultsPanel = ({ stdout, stderr, testResults }) => {
         return null;
     }
     return (
-        <div dir="rtl" className="bg-gray-900 p-4 rounded-lg mt-4 text-right text-sm">
-            <h3 className="font-bold text-lg mb-2 text-white">النتائج</h3>
+        <div dir="rtl" className="bg-[var(--color-bg-primary)] p-4 rounded-lg mt-4 text-right text-sm border border-[var(--color-border-primary)]">
+            <h3 className="font-bold text-lg mb-2 text-[var(--color-text-primary)]">النتائج</h3>
             {stderr && (
                 <div className="mb-4">
-                    <h4 className="font-semibold text-red-400">أخطاء (Stderr):</h4>
-                    <pre className="bg-black text-red-300 p-2 rounded-md whitespace-pre-wrap font-mono">{stderr}</pre>
+                    <h4 className="font-semibold text-[var(--color-error)]">أخطاء (Stderr):</h4>
+                    <pre className="bg-black/50 text-red-300 p-2 rounded-md whitespace-pre-wrap font-mono">{stderr}</pre>
                 </div>
             )}
             {stdout && (
                 <div className="mb-4">
-                    <h4 className="font-semibold text-blue-400">المخرجات (Stdout):</h4>
-                    <pre className="bg-black text-gray-300 p-2 rounded-md whitespace-pre-wrap font-mono">{stdout}</pre>
+                    <h4 className="font-semibold text-[var(--color-accent-primary)]">المخرجات (Stdout):</h4>
+                    <pre className="bg-black/50 text-[var(--color-text-secondary)] p-2 rounded-md whitespace-pre-wrap font-mono">{stdout}</pre>
                 </div>
             )}
             {testResults && testResults.length > 0 && (
                  <div>
-                    <h4 className="font-semibold text-white">حالات الاختبار:</h4>
+                    <h4 className="font-semibold text-[var(--color-text-primary)]">حالات الاختبار:</h4>
                     <ul className="space-y-2 mt-2">
                         {testResults.map((result, index) => (
                             <li key={index} className={`p-3 rounded-md ${result.passed ? 'bg-green-900/50' : 'bg-red-900/50'}`}>
@@ -40,9 +40,9 @@ const ResultsPanel = ({ stdout, stderr, testResults }) => {
                                     {result.passed ? <FaCheck className="text-green-400" /> : <FaTimes className="text-red-400" />}
                                 </div>
                                 <div className="font-mono text-xs mt-2 space-y-1">
-                                    <p><span className="font-semibold text-gray-400">المدخل:</span> {JSON.stringify(result.input)}</p>
-                                    <p><span className="font-semibold text-gray-400">المتوقع:</span> {JSON.stringify(result.expected_output)}</p>
-                                    <p><span className="font-semibold text-gray-400">الفعلي:</span> {JSON.stringify(result.actual_output)}</p>
+                                    <p><span className="font-semibold text-[var(--color-text-muted)]">المدخل:</span> {JSON.stringify(result.input)}</p>
+                                    <p><span className="font-semibold text-[var(--color-text-muted)]">المتوقع:</span> {JSON.stringify(result.expected_output)}</p>
+                                    <p><span className="font-semibold text-[var(--color-text-muted)]">الفعلي:</span> {JSON.stringify(result.actual_output)}</p>
                                 </div>
                             </li>
                         ))}
@@ -145,7 +145,7 @@ const CodeChallengeTask = ({ definition, onComplete, taskId, feedback, setFeedba
                 taskId={taskId}
             />
 
-            <div className="bg-gray-800 rounded-2xl p-6 h-full flex flex-col text-left gap-4 relative" dir="ltr">
+            <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-2xl p-6 h-full flex flex-col text-left gap-4 relative" dir="ltr">
                 {showConfetti && <Confetti recycle={false} />}
                 
                 <div className="flex-grow flex flex-col" style={{ minHeight: '300px' }}>
@@ -155,7 +155,7 @@ const CodeChallengeTask = ({ definition, onComplete, taskId, feedback, setFeedba
                         theme={okaidia}
                         extensions={langExtension}
                         onChange={(value) => setCode(value)}
-                        className="flex-grow rounded-lg overflow-hidden border border-gray-700 force-ltr"
+                        className="flex-grow rounded-lg overflow-hidden border border-[var(--color-border-primary)] force-ltr"
                         readOnly={isSubmitting || (feedback && feedback.is_correct)}
                     />
                 </div>
@@ -163,7 +163,7 @@ const CodeChallengeTask = ({ definition, onComplete, taskId, feedback, setFeedba
                 <ResultsPanel {...(results || {})} />
 
                 {feedback && !feedback.is_correct && (
-                     <div dir="rtl" className={`p-3 rounded-lg text-right flex justify-between items-center bg-red-900/50 text-red-300`}>
+                     <div dir="rtl" className="p-3 rounded-lg text-right flex justify-between items-center bg-red-900/50 text-red-300">
                         <p>{feedback.message}</p>
                         <FaTimes />
                      </div>
@@ -173,7 +173,7 @@ const CodeChallengeTask = ({ definition, onComplete, taskId, feedback, setFeedba
                     {feedback?.is_correct ? (
                         <button
                             onClick={onComplete}
-                            className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-500 transition-colors"
+                            className="bg-[var(--color-accent-primary)] text-white font-bold py-2 px-6 rounded-lg hover:opacity-90 transition-all"
                         >
                             المهمة التالية
                         </button>
@@ -182,7 +182,7 @@ const CodeChallengeTask = ({ definition, onComplete, taskId, feedback, setFeedba
                              <button
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
-                                className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-500 transition-colors duration-300 flex items-center gap-2 disabled:bg-gray-500"
+                                className="bg-[var(--color-success)] text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300 flex items-center gap-2 disabled:bg-[var(--color-text-muted)]"
                             >
                                 {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaPlay />}
                                 <span>{isSubmitting ? 'جاري التحقق...' : 'تشغيل والتحقق'}</span>
@@ -190,7 +190,7 @@ const CodeChallengeTask = ({ definition, onComplete, taskId, feedback, setFeedba
                             {solution_display && (
                                 <button 
                                     onClick={handleShowSolution} 
-                                    className="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-500 transition-colors text-sm flex items-center gap-2"
+                                    className="bg-[var(--color-accent-secondary)] text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-all text-sm flex items-center gap-2"
                                 >
                                     <FaEye />
                                     <span>إظهار الحل</span>
@@ -198,7 +198,7 @@ const CodeChallengeTask = ({ definition, onComplete, taskId, feedback, setFeedba
                             )}
                              <button 
                                 onClick={resetTaskState} 
-                                className="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-500 transition-colors text-sm flex items-center gap-2"
+                                className="bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] font-bold py-2 px-4 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-all text-sm flex items-center gap-2 border border-[var(--color-border-primary)]"
                             >
                                 <FaSync />
                                 <span>إعادة تعيين</span>
